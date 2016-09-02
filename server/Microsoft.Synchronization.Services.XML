@@ -1,0 +1,3058 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.Synchronization.Services</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Synchronization.Services.Conflict">
+            <summary>
+            Represents a Conflict base type. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Conflict.LiveEntity">
+            <summary>
+            Represents the current live version that is stored on the server. The version when applied on
+            the client will ensure data convergence between server and client for this particular
+            entity.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.IOfflineEntity">
+            <summary>
+            Represents the base interface that all offline cacheable object should derive from.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.IOfflineEntity.ServiceMetadata">
+            <summary>
+            Represents the sync and OData metadata used for the entity
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.OfflineEntityMetadata">
+            <summary>
+            Class that represents the metadata required for the sync protocol to work correctly.
+            Applications should not change these properties except when required by the protocol
+            (the Id will change for an item that is inserted for the first time).
+            The exception to this is the IsTombstone property, which should be set when the application
+            is using a custom store and an item is being deleted.  Applications using the
+            IsolatedStorageOfflineContext should never set any properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.OfflineEntityMetadata.#ctor">
+            <summary>
+            Public constructor for the metadata
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.OfflineEntityMetadata.#ctor(System.Boolean,System.String,System.String,System.Uri)">
+            <summary>
+            Public constructor for the metadata which takes parameters for the metadata.
+            </summary>
+            <param name="isTombstone">Whether or not the entity is a tombstone</param>
+            <param name="id">Sync id for the item</param>
+            <param name="etag">Item's OData ETag</param>
+            <param name="editUri">Item's OData Edit Uri</param>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.OfflineEntityMetadata.IsTombstone">
+            <summary>
+            Whether or not the entity to which this item is attached is a tombstone
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.OfflineEntityMetadata.Id">
+            <summary>
+            The Id for the entity used for synchronization.  This should not be set by applications
+            and should be empty when an item is first uploaded.  It will be subsequently filled in 
+            during the upload response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.OfflineEntityMetadata.ETag">
+            <summary>
+            The OData ETag for the item.  This should not be set by applications and should
+            be empty during the first upload for an item.  It will subsequently be filled in
+            after upload.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.OfflineEntityMetadata.EditUri">
+            <summary>
+            The OData edit Uri for the item.  This should not be set by applications and should
+            be empty during the first upload for an item.  It will subsequently be filled in
+            after upload.
+            </summary>
+        </member>
+        <member name="E:Microsoft.Synchronization.Services.OfflineEntityMetadata.PropertyChanged">
+            <summary>
+            Property changed event for when any properties change (should only happen once).
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.OfflineEntityMetadata.Clone">
+            <summary>
+            Used while creating Snapshot to do a depp copy of the original copy's metadata
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncConflict">
+            <summary>
+            Represents a Synchronization related Conflict that was raised and handled on the server.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncConflict.LosingEntity">
+            <summary>
+            This represents the version of the Entity that lost in the conflict resolution.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncConflict.Resolution">
+            <summary>
+            This represents the Conflict resolution policy that was applied
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncConflictResolution">
+            <summary>
+            Represents the resolution that the server employed to resolve a conflict.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SyncConflictResolution.ServerWins">
+            <summary>
+            Client version was ignored.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SyncConflictResolution.ClientWins">
+            <summary>
+            Server version was ignored.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SyncConflictResolution.Merge">
+            <summary>
+            Changes from both server and client version were merged
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncError">
+            <summary>
+            Represents a Synchronization related backend store error that was raised and handled on the server.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncError.ErrorEntity">
+            <summary>
+            Represents a copy of the Client Entity that raised the error on the server.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncError.Description">
+            <summary>
+            The description as sent by the sync service explaining the reason for the error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomEntryInfoWrapper.#ctor(System.Xml.Linq.XElement)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomEntryInfoWrapper.LoadConflictEntry(System.Xml.Linq.XElement)">
+            <summary>
+            Looks for a sync:syncConflict or an sync:syncError element
+            </summary>
+            <param name="entry">entry element</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomEntryInfoWrapper.GetSubElement(System.Xml.Linq.XElement)">
+            <summary>
+            Looks for either a &lt;entry/&gt; or a &lt;deleted-entry/&gt; subelement within the outer element.
+            </summary>
+            <param name="entryElement">The outer entry element</param>
+            <returns>The inner entry or the deleted-entry subelement</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomEntryInfoWrapper.LoadEntryProperties(System.Xml.Linq.XElement)">
+            <summary>
+            Inspects all m.properties element in the entry element to load all properties.
+            </summary>
+            <param name="entry">Entry element</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomEntryInfoWrapper.LoadTypeName(System.Xml.Linq.XElement)">
+            <summary>
+            Looks for the category element in the entry for the type name
+            </summary>
+            <param name="entry">Entry element</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomHelper.IsAtomElement(System.Xml.XmlReader,System.String)">
+            <summary>
+            Check whether the XmlReader is currently at the start of an element with 
+            the given name in the Atom namespace
+            </summary>
+            <param name="reader">XmlReader to check on</param>
+            <param name="name">Element name</param>
+            <returns>True if the reader if at the indicated Atom element</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomHelper.IsAtomTombstone(System.Xml.XmlReader,System.String)">
+            <summary>
+            Check whether the XmlReader is currently at the start of an tombstone element with 
+            the given name in the Tombstone namespace
+            </summary>
+            <param name="reader">XmlReader to check on</param>
+            <param name="name">Element name</param>
+            <returns>True if the reader if at the indicated Atom element</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomHelper.IsODataNamespace(System.Xml.XmlReader,System.Xml.Linq.XNamespace)">
+            <summary>
+            Check whether the XmlReader is currently at the start of an element 
+            in the Odata namespace
+            </summary>
+            <param name="reader">XmlReader to check on</param>
+            <param name="ns">Element Namespace name</param>
+            <returns>True if the reader if at the indicated namespace</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.AtomHelper.IsSyncElement(System.Xml.XmlReader,System.String)">
+            <summary>
+            Check whether the XmlReader is currently at the start of an element with 
+            the given name in the sync namespace
+            </summary>
+            <param name="reader">XmlReader to check on</param>
+            <param name="name">Element name</param>
+            <returns>True if the reader if at the indicated anchor element</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Formatters.EntryInfoWrapper">
+            <summary>
+            Internal helper class that reads and parses all relevant information about an entry element.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.EntryInfoWrapper.#ctor(System.Xml.Linq.XElement)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.FormatterUtilities.ConvertDateTimeForType_Json(System.Object,System.Type)">
+            <summary>
+            Looks at passed in Type and calls the appropriate Date functions for Json
+            </summary>
+            <param name="objValue">Actual value</param>
+            <param name="type">Type coverting from</param>
+            <returns>Json representation</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.FormatterUtilities.ConvertDateTimeForType_Atom(System.Object,System.Type)">
+            <summary>
+            Looks at passed in Type and calls the appropriate Date functions for Atom
+            </summary>
+            <param name="objValue">Actual value</param>
+            <param name="type">Type coverting from</param>
+            <returns>Atom representation</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.FormatterUtilities.ConvertDateTimeToAtom(System.DateTime)">
+            <summary>
+            Converts DateTime to OData Atom format as specified in http://www.odata.org/developers/protocols/atom-format#PrimitiveTypes for DateTime
+            Format is"yyyy-MM-ddThh:mm:ss.fffffff"
+            <param name="date">DateTime to convert</param>
+            </summary>
+            <returns>Atom representation of DateTime</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.FormatterUtilities.ConvertTimeToAtom(System.TimeSpan)">
+            <summary>
+            Converts a TimeSpan to OData atom format as specified in http://www.odata.org/developers/protocols/atom-format#PrimitiveTypes for Time
+            Actual lexical representation is time'hh:mm:ss.fffffff'
+            </summary>
+            <param name="t">Timespan to convert</param>
+            <returns>Atom representation of Timespan</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.FormatterUtilities.ConvertDateTimeOffsetToAtom(System.DateTimeOffset)">
+            <summary>
+            Converts a DateTimeOffset to OData Atom format as specified in http://www.odata.org/developers/protocols/atom-format#PrimitiveTypes for DateTimeOffset
+            Actual lexical representation is datetimeoffset'yyyy-MM-ddThh:mm:ss.fffffffzzz'
+            </summary>
+            <param name="dto">Timespan to convert</param>
+            <returns>Atom representation of Timespan</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.FormatterUtilities.ConvertDateTimeToJson(System.DateTime)">
+            <summary>
+            Converts DateTime to OData Json format as specified in http://www.odata.org/developers/protocols/json-format#PrimitiveTypes for DateTime
+            Format is"\/Date(&lt;ticks&gt;["+" | "-" &lt;offset&gt;)\/"
+            &lt;ticks&gt; = number of milliseconds since midnight Jan 1, 1970
+            &lt;offset&gt; = number of minutes to add or subtract
+            </summary>
+            <param name="date">DateTime to convert</param>
+            <returns>Json representation of DateTime</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.FormatterUtilities.ConvertTimeToJson(System.TimeSpan)">
+            <summary>
+            Converts a TimeSpan to OData Json format as specified in http://www.odata.org/developers/protocols/json-format#PrimitiveTypes for Time
+            Actual lexical representation is time'hh:mm:ss.fffffff'
+            </summary>
+            <param name="t">Timespan to convert</param>
+            <returns>Json representation of Timespan</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.FormatterUtilities.ConvertDateTimeOffsetToJson(System.DateTimeOffset)">
+            <summary>
+            Converts a DateTimeOffset to OData Json format as specified in http://www.odata.org/developers/protocols/json-format#PrimitiveTypes for DateTimeOffset
+            Actual lexical representation is datetimeoffset'yyyy-MM-ddThh:mm:ss.fffffffzzz'
+            </summary>
+            <param name="dto">Timespan to convert</param>
+            <returns>Json representation of Timespan</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Formatters.JsonEntryInfoWrapper">
+            <summary>
+            Internal helper class that reads and parses all relevant information about an Json object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.JsonEntryInfoWrapper.#ctor(System.Xml.Linq.XElement)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.JsonEntryInfoWrapper.LoadConflictEntry(System.Xml.Linq.XElement)">
+            <summary>
+            Looks for a syncConflict key or an syncError key inside an Json object
+            </summary>
+            <param name="entry">entry element</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.JsonEntryInfoWrapper.LoadEntryProperties(System.Xml.Linq.XElement)">
+            <summary>
+            Inspects all Key/value pairs in the JSON element to load all properties.
+            </summary>
+            <param name="entry">Entry element</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.JsonEntryInfoWrapper.LoadTypeName(System.Xml.Linq.XElement)">
+            <summary>
+            Looks for the 'type' key inside of the __metadata : {}  Json object
+            </summary>
+            <param name="entry">Entry element</param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Formatters.ODataAtomReader">
+            <summary>
+            SyncReader implementation for the OData Atompub format
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomReader.#ctor(System.IO.Stream)">
+            <summary>
+            Constructor with no KnownTypes specified
+            </summary>
+            <param name="stream">Input reader stream</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomReader.#ctor(System.IO.Stream,System.Type[])">
+            <summary>
+            Constructor with KnownTypes specified
+            </summary>
+            <param name="stream">Input reader stream</param>
+            <param name="knownTypes">List of types to reflect from</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomReader.Start">
+            <summary>
+            Validates that the stream contains a valid feed item.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Formatters.ODataAtomReader.ItemType">
+            <summary>
+            Returns the current Item type at which the reader is positioned.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomReader.GetItem">
+            <summary>
+            Returns the current entry element casted as an IOfflineEntity element
+            </summary>
+            <returns>Typed entry element</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomReader.GetHasMoreChangesValue">
+            <summary>
+            Returns the value of the sync:hasMoreChanges element
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomReader.GetServerBlob">
+            <summary>
+            Returns the sync:serverBlob element contents
+            </summary>
+            <returns>byte[]</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomReader.Next">
+            <summary>
+            Traverses through the feed and returns when it arrives at the necessary element.
+            </summary>
+            <returns>bool detecting whether or not there is more elements to be read.</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Formatters.ODataAtomWriter">
+            <summary>
+            SyncWriter implementation for the OData Atompub format
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomWriter.#ctor(System.Uri)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="serviceUri">Service Url to include as the base namespace</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomWriter.StartFeed(System.Boolean,System.Byte[])">
+            <summary>
+            Should be called prior to any Items are added to the stream. This ensures that the stream is 
+            set up with the right doc level feed parameters
+            </summary>
+            <param name="isLastBatch">Whether this feed will be the last batch or not.</param>
+            <param name="serverBlob">Sync server blob.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomWriter.WriteFeed(System.Xml.XmlWriter)">
+            <summary>
+            Called by the runtime when all entities are written and contents needs to flushed to the underlying stream.
+            </summary>
+            <param name="writer">XmlWriter to which this feed will be serialized to</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomWriter.WriteItemInternal(Microsoft.Synchronization.Services.IOfflineEntity,System.String,Microsoft.Synchronization.Services.IOfflineEntity,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Adds an IOfflineEntity and its associated Conflicting/Error entity as an Atom entry element
+            </summary>
+            <param name="live">Live Entity</param>
+            <param name="liveTempId">TempId for the live entity</param>
+            <param name="conflicting">Conflicting entity that will be sent in synnConflict or syncError extension</param>
+            <param name="conflictingTempId">TempId for the conflicting entity</param>
+            <param name="desc">Error description or the conflict resolution</param>
+            <param name="isConflict">Denotes if its an errorElement or conflict. Used only when <paramref name="desc"/> is not null</param>
+            <param name="emitMetadataOnly">Bool flag that denotes whether a partial metadata only entity is to be written</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomWriter.WriteEntry(Microsoft.Synchronization.Services.IOfflineEntity,System.String,System.Boolean)">
+            <summary>
+            Writes the <entry/> tag and all its related elements.
+            </summary>
+            <param name="live">Actual entity whose value is to be emitted.</param>
+            <param name="tempId">The temporary Id if any</param>
+            <param name="emitPartial">Bool flag that denotes whether a partial metadata only entity is to be written</param>
+            <returns>XElement representation of the entry element</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataAtomWriter.WriteEntityContents(Microsoft.Synchronization.Services.IOfflineEntity)">
+            <summary>
+            This writes the public contents of the Entity in the properties element.
+            </summary>
+            <param name="entity">Entity</param>
+            <returns>XElement representation of the properties element</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonReader.#ctor(System.IO.Stream)">
+            <summary>
+            Constructor with no KnownTypes specified
+            </summary>
+            <param name="stream">Input reader stream</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonReader.#ctor(System.IO.Stream,System.Type[])">
+            <summary>
+            Constructor with KnownTypes specified
+            </summary>
+            <param name="stream">Input reader stream</param>
+            <param name="knownTypes">List of types to reflect from</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonReader.Start">
+            <summary>
+            Validates that the stream contains a valid Json feed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Formatters.ODataJsonReader.ItemType">
+            <summary>
+            Returns the current Item type at which the reader is positioned.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonReader.GetItem">
+            <summary>
+            Returns the current Json object casted as an IOfflineEntity element
+            </summary>
+            <returns>Typed entry element</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonReader.GetHasMoreChangesValue">
+            <summary>
+            Returns the value of the hasMoreChanges key in __sync:{} Json object
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonReader.GetServerBlob">
+            <summary>
+            Returns the serverBlob key contents from the __sync:{} Json object
+            </summary>
+            <returns>byte[]</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonReader.Next">
+            <summary>
+            Traverses through the feed and returns when it arrives at the necessary object.
+            </summary>
+            <returns>bool detecting whether or not there is more elements to be read.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonWriter.#ctor(System.Uri)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="serviceUri">Service Url to include as the base namespace</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonWriter.StartFeed(System.Boolean,System.Byte[])">
+            <summary>
+            Should be called prior to any Items are added to the stream. This ensures that the stream is 
+            set up with the right doc level feed parameters
+            </summary>
+            <param name="isLastBatch">Whether this feed will be the last batch or not.</param>
+            <param name="serverBlob">Sync server blob.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonWriter.WriteFeed(System.Xml.XmlWriter)">
+            <summary>
+            Called by the runtime when all entities are written and contents needs to flushed to the underlying stream.
+            </summary>
+            <param name="writer">XmlWriter to which this Json feed will be serialized to</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonWriter.WriteItemInternal(Microsoft.Synchronization.Services.IOfflineEntity,System.String,Microsoft.Synchronization.Services.IOfflineEntity,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Adds an IOfflineEntity and its associated Conflicting/Error entity as an Atom entry element
+            </summary>
+            <param name="live">Live Entity</param>
+            <param name="liveTempId">TempId for the live entity</param>
+            <param name="conflicting">Conflicting entity that will be sent in synnConflict or syncError extension</param>
+            <param name="conflictingTempId">TempId for the conflicting entity</param>
+            <param name="desc">Error description or the conflict resolution</param>
+            <param name="isConflict">Denotes if its an errorElement or conflict. Used only when <paramref name="desc"/> is not null</param>
+            <param name="emitMetadataOnly">Bool flag that denotes whether a partial metadata only entity is to be written</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonWriter.WriteEntry(Microsoft.Synchronization.Services.IOfflineEntity,System.Xml.Linq.XElement,System.String,System.Boolean)">
+            <summary>
+            Writes the Json object tag and all its related elements.
+            </summary>
+            <param name="live">Actual entity whose value is to be emitted.</param>
+            <param name="entryElement">This is the parent entry element that is needs to go in to. Will be null for regular items and non null for 
+            conflict/error items only</param>
+            <param name="tempId">The tempId for the element if passed in by the client.</param>
+            <param name="emitPartial">Bool flag that denotes whether a partial metadata only entity is to be written</param>
+            <returns>XElement representation of the entry element</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ODataJsonWriter.WriteEntityContentsToElement(System.Xml.Linq.XElement,Microsoft.Synchronization.Services.IOfflineEntity)">
+            <summary>
+            This writes the public contents of the Entity to the passed in XElement.
+            </summary>
+            <param name="contentElement">The XElement to which the type properties is added to</param>
+            <param name="entity">Entity</param>
+            <returns>XElement representation of the properties element</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Formatters.ReflectionUtility">
+            <summary>
+            Class that will use .NET Reflection to serialize and deserialize an Entity to Atom/JSON
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ReflectionUtility.GetPrimaryKeysPropertyInfoMapping(System.Type)">
+            <summary>
+            Get the PropertyInfo array for all Key fields
+            </summary>
+            <param name="type">Type to reflect on</param>
+            <returns>PropertyInfo[]</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ReflectionUtility.GetPrimaryKeyString(Microsoft.Synchronization.Services.IOfflineEntity)">
+            <summary>
+            Build the OData Atom primary keystring representation
+            </summary>
+            <param name="live">Entity for which primary key is required</param>
+            <returns>String representation of the primary key</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.ReflectionUtility.SetDataTablePrimaryKeys(System.Data.DataTable,System.Type,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Reflects the Type to figure out which is the primary key for the DataTable
+            </summary>
+            <param name="table">Table to set primary keys on</param>
+            <param name="type">Type to reflect</param>
+            <param name="mappingInfo">Global to Local column name mappings</param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Formatters.SyncReader">
+            <summary>
+            Abstract class for SyncReader that individual format readers needs to extend
+            </summary>    
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncReader.HasConflict">
+            <summary>
+            Check to see if the current object that was just parsed had a conflict element on it or not.
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncReader.HasConflictTempId">
+            <summary>
+            Check to see if the current conflict object that was just parsed has a tempId element on it or not.
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncReader.HasTempId">
+            <summary>
+            Check to see if the current object that was just parsed has a tempId element on it or not.
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncReader.GetTempId">
+            <summary>
+            Returns the TempId parsed from the current object if present
+            </summary>
+            <returns>string</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncReader.GetConflictTempId">
+            <summary>
+            Returns the TempId parsed from the current conflict object if present
+            </summary>
+            <returns>string</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncReader.GetConflict">
+            <summary>
+            Get the conflict item
+            </summary>
+            <returns>Conflict item</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Formatters.SyncWriter">
+            <summary>
+            Abstract class for SyncWriter that individual format writers needs to extend
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncWriter.AddItem(Microsoft.Synchronization.Services.IOfflineEntity,System.String)">
+            <summary>
+            Called to add a particular Entity
+            </summary>
+            <param name="entry">Entity to add to serialize to the stream</param>
+            <param name="tempId">TempId for the Entity</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncWriter.AddItem(Microsoft.Synchronization.Services.IOfflineEntity,System.String,System.Boolean)">
+            <summary>
+            Called to add a particular Entity
+            </summary>
+            <param name="entry">Entity to add to serialize to the stream</param>
+            <param name="tempId">TempId for the Entity</param>
+            <param name="emitMetadataOnly">Bool flag that denotes whether a partial metadata only entity is to be written</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncWriter.AddConflictItem(Microsoft.Synchronization.Services.IOfflineEntity,System.String,Microsoft.Synchronization.Services.IOfflineEntity,System.String,Microsoft.Synchronization.Services.SyncConflictResolution)">
+            <summary>
+            Called to add a Sync conflict item
+            </summary>
+            <param name="winningEntry">the winning entity</param>
+            <param name="winningEntryTempId">the winning entity's tempId</param>
+            <param name="losingEntry">The losing entity</param>
+            <param name="losingEntryTempId">The losing entity's tempId</param>
+            <param name="resolution">The conflict resolution aplied by the server</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Formatters.SyncWriter.AddErrorItem(Microsoft.Synchronization.Services.IOfflineEntity,Microsoft.Synchronization.Services.IOfflineEntity,System.String,System.String)">
+            <summary>
+            Called to add a Sync Error item
+            </summary>
+            <param name="liveEntry">Live version of the entity</param>
+            <param name="errorEntry">Version of the entity that caused the error.</param>
+            <param name="errorEntryTempId">TempIf for the entity that caused the error.</param>
+            <param name="errorDescription">Description of error.</param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Batching.Batch">
+            <summary>
+            This class represents an individual batch that can be sent to the client. 
+            Each batch has the client blob that contains the knowledge plus other batch related info.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.Batch.BatchCode">
+            <summary>
+            Batch code which is the folder under which all the batches are saved as files.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.Batch.LearnedKnowledge">
+            <summary>
+            Knowledge that will be learned from this batch. Need to combine this with the client knowledge for the learned knowledge.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.Batch.Data">
+            <summary>
+            Data that needs to be sent to the client.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.Batch.IsLastBatch">
+            <summary>
+            Indicates if this is the last batch of the series.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.Batch.FileName">
+            <summary>
+            File name of the current batch.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.Batch.ClientScopeName">
+            <summary>
+            Scope to which the batch belongs.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.Batch.NextBatch">
+            <summary>
+            The next batch number. Returns null if IsLastBatch is true.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Batching.BatchHeader">
+            <summary>
+            Represents a batch directory header. 
+            
+            This contains the list of all batch files in sequence. The start batch file and the end batch file.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.BatchHeader.BatchFileNames">
+            <summary>
+            Gets/sets the list of batch files.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Batching.BatchHeader.BatchCode">
+            <summary>
+            Gets/Sets the batch code. All batches in a change enumeration have a batch code assigned which helps us to correlate them
+            during storage and retrieval.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Batching.FileBasedBatchHandler">
+            <summary>
+            An implementation of a file based batch handler that is capable of saving and retriving change batches.
+            
+            Files are cleaned up as they are retrieved. Otherwise the general guideline is to implement a job which periodically 
+            cleans up files based on the age.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Batching.FileBasedBatchHandler.SaveBatches(System.Collections.Generic.List{Microsoft.Synchronization.Services.Batching.Batch},Microsoft.Synchronization.Services.Batching.BatchHeader)">
+            <summary>
+            Save batches and the header.
+            </summary>
+            <param name="batchList">BatchList to save</param>
+            <param name="header">Header information</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Batching.FileBasedBatchHandler.GetNextBatch(System.Guid,System.Guid)">
+            <summary>
+            Gets the next batch in a sequence.
+            </summary>
+            <param name="batchCode">Batch code value</param>
+            <param name="nextBatchSequenceNumber">Sequence number of the next batch</param>
+            <returns>Batch information</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Batching.IBatchHandler">
+            <summary>
+            Interface that a custom batch handler should implement. This will allow us to 
+            plug in batch handlers independent of the storage used. 
+            
+            For now the default FileBasedBatchHandler implementation is provided.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Batching.IBatchHandler.SaveBatches(System.Collections.Generic.List{Microsoft.Synchronization.Services.Batching.Batch},Microsoft.Synchronization.Services.Batching.BatchHeader)">
+            <summary>
+            Save batches and the header.
+            </summary>
+            <param name="batchList">BatchList to save</param>
+            <param name="header">Header information</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.Batching.IBatchHandler.GetNextBatch(System.Guid,System.Guid)">
+            <summary>
+            Gets the next batch in a sequence.
+            </summary>
+            <param name="batchCode">Batch code value</param>
+            <param name="nextBatchSequenceNumber">Sequence number of the next batch</param>
+            <returns>Batch information</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.MetadataCache">
+            <summary>
+            This class represents a cache of metadata for a sync service.
+            The cache key is denoted by the type MetadataCacheKey and an item in the cache is of type
+            MetadataCacheItem.
+            This will allow us to store a lot of metadata about the service and scope it to a single service head thus also
+            allowing us to host multiple service heads in a single website on IIS or Azure.
+            
+            Usage:
+            Metadata for a new service can be added as follows:
+                    MetadataCache.AddCacheItem(serviceType, item);
+            Where serviceType is the type of the service class and item is of type MetadataCacheItem.
+            
+            Similarly, you can lookup an item from the cache using the service type as follows:
+                    MetadataCacheItem item = MetadataCache.TryLookup(serviceType);
+            Where serviceType is the type of the service class.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.MetadataCache._cache">
+            <summary>
+            Cache that contains the service metadata.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.MetadataCache._lockObject">
+            <summary>
+            Lock used for concurrency scenarios when adding and looking up items from the cache.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.MetadataCache.AddCacheItem(System.Type,Microsoft.Synchronization.Services.MetadataCacheItem)">
+            <summary>
+            Add an MetadataCacheItem object to the cache for a given service.
+            </summary>
+            <param name="serviceType">Type of the service class</param>
+            <param name="item">Item to be added to the cache</param>
+            <returns>Item that was added to the cache</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.MetadataCache.TryLookup(System.Type)">
+            <summary>
+            Lookup an item from the metadata cache for a given service type.
+            </summary>
+            <param name="serviceType">Service type for which we want to lookup metadata.</param>
+            <returns>MetadataCacheItem for the service type. Null if there is no item in the cache for the given service type.</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.MetadataCacheItem">
+            <summary>
+            This class represents a value in the MetadataCache dictionary.
+            
+            Note: Moving forward, this class will contain more information about the service as we implement
+            multiple scopes and custom provider functionality in the service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.MetadataCacheItem.Configuration">
+            <summary>
+            SyncServiceConfiguration for the service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.MetadataCacheItem.ServiceType">
+            <summary>
+            Get the service type from the item.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.MetadataCacheItem.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of the MetadataCacheItem class.
+            </summary>
+            <param name="serviceType">Type of the service for which an instance of this class is being created.</param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.MetadataCacheKey">
+            <summary>
+            This class represents a key in the MetadataCache dictionary.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.MetadataCacheKey.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of the MetadataCacheKey class.
+            </summary>
+            <param name="serviceType">Type of the service for which an instance of this class is being created.</param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncServiceConfiguration">
+            <summary>
+            This class is used to configure service wide policies for the SyncService implementation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.TableGlobalNameToTypeMapping">
+            <summary>
+            Contains mapping of table global name name to entity type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.TypeToTableGlobalNameMapping">
+            <summary>
+            For faster lookup, this cache stores the reverse mapping between a type and the corresponding table global name.
+            The global name is used when manipulating Datasets.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.TypeToTableLocalNameMapping">
+            <summary>
+            For faster lookup, this cache stores the mapping between a type and the corresponding table local name.
+            The local name is needed when making direct queries against the datastore.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.ScopeNames">
+            <summary>
+            List of scopes enabled.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.InitializeMethod">
+            <summary>
+            Delegate to the InitializeService method in usercode.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.SyncInterceptors">
+            <summary>
+            Cache of the ScopeName - SyncInterceptors mapping
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.SyncObjectSchema">
+            <summary>
+            Contains the SQL Schema that was used to provision the sync objects in the database.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.IsInitialized">
+            <summary>
+            Indicates if the configuration is initialized. 
+            We ideally don't want to allow rediscovery of types (mainly for performance),
+            so this flag is checked before the type discovery is attempted.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.FilterParameters">
+            <summary>
+            Readonly list that contains the filter parameters that the service is configured to operate on.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.SetConflictResolutionPolicy(Microsoft.Synchronization.Services.ConflictResolutionPolicy)">
+            <summary>
+            Change the default conflict resolution policy. The default value is ClientWins.
+            </summary>
+            <param name="policy">The new conflict resolution policy</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.SetDefaultSyncSerializationFormat(Microsoft.Synchronization.Services.SyncSerializationFormat)">
+            <summary>
+            Change the default serialization format. The default value is ODataAtom.
+            </summary>
+            <param name="serializationFormat">serialization format</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.SetEnableScope(System.String)">
+            <summary>
+            Enable scopes.
+            </summary>
+            <param name="scopeName">Scope name to enable for sync.</param>
+            <exception cref="T:System.ArgumentNullException">Throws when scopeName is null</exception>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.AddFilterParameterConfiguration(System.String,System.String,System.String,System.Type)">
+            <summary>
+            Add a new filter parameter configuration.
+            </summary>
+            <param name="queryStringParam">Name of the querystring parameter</param>
+            <param name="tableName">SQL table name</param>
+            <param name="sqlParameterName">SQL parameter name (has to be exact since its used in query formation)</param>
+            <param name="typeOfParam">Indicates the Type of the parameter</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.SetBatchSpoolDirectory(System.String)">
+            <summary>
+            Set the path where batches will be spooled. The directory must already exist. Default directory is %TEMP%.
+            </summary>
+            <param name="directoryPath">Path to the batch spooling directory.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.SetDownloadBatchSize(System.UInt32)">
+            <summary>
+            Set a download batch size. Batching is disabled by default.
+            </summary>
+            <param name="batchSizeInKB">Download batch size in KB</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.SetSyncObjectSchema(System.String)">
+            <summary>
+            Set the schema name under which sync related objects were generated in the SQL database when the database was provisioned.
+            </summary>
+            <param name="schemaName">Name of the schema under which sync related objects are created.</param>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.ServerConnectionString">
+            <summary>
+            Gets/Sets the server connection string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.UseVerboseErrors">
+            <summary>
+            Gets/Sets the log level for sync operations. Default value is None.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.IsBatchingEnabled">
+            <summary>
+            Indicates if batching is enabled on the provider service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceConfiguration.EnableDiagnosticPage">
+            <summary>Enable or disable the diagnostic page served by the $diag URL.</summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.Initialize(System.Type)">
+            <summary>
+            Invokes the static InitializeService method that allows one-time service wide policy configuration.
+            </summary>
+            <param name="syncServiceType">service type (used for reflection).</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.ReadSyncInterceptors(System.Type)">
+            <summary>
+            Inspects and builds a list of SyncOperationInterceptor info from the user code.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.InvokeInitializeUserMethod(System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Invokes the user method that is supposed to initialize a new client. 
+            If this method is not defined, then just returns the scopeName passed in to the method. The caller
+            has to ensure that this is unique for the client that is making the request.
+            </summary>
+            <param name="filterParams">Filter parameters obtained from the incoming request</param>
+            <returns>Property bag containing provider specific filter params.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.InvokeOperationInterceptors(Microsoft.Synchronization.Services.SyncOperationContext,System.Type,System.Boolean)">
+            <summary>
+            Utility function that invokes the actual user interceptor extension method. If entityType is null
+            it looks for the generic interceptor. If its not null then it looks for a typed interceptor for the
+            specific type being passed.
+            </summary>
+            <param name="context">The context to pass as parameter to user code</param>
+            <param name="entityType">Type of the entity being processed</param>
+            <param name="isRequest">True if intercepting a request operation else false.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.InvokeConflictInterceptor(Microsoft.Synchronization.Services.SyncConflictContext,System.Type,Microsoft.Synchronization.Services.IOfflineEntity@)">
+            <summary>
+            Utility for invoking user code for conflict interceptors
+            </summary>
+            <param name="context">The context to pass as parameter to user code</param>
+            <param name="mergedVersion">The merged version for Merge resolution</param>
+            <param name="entityType">Entity type of the conflict being raised</param>
+            <returns>Actual resolution picked by user</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasConflictInterceptors(System.String)">
+            <summary>
+            Checks to see if a SyncConflictInterceptor has been configured by the user
+            </summary>
+            <returns>Boolean on whether or not a interceptor was configured</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasRequestInterceptors(System.String,Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Checks to see if a SyncRequestInterceptor for a specific operation has been configured by the user
+            </summary>
+            <returns>Boolean on whether or not a interceptor was configured</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasResponseInterceptors(System.String,Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Checks to see if a SyncResponseInterceptor for a specific operation has been configured by the user
+            </summary>
+            <returns>Boolean on whether or not a interceptor was configured</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasTypedRequestInterceptors(System.String)">
+            <summary>
+            Checks to see if a typed SyncRequestInterceptor for a specific operation has been configured by the user
+            </summary>
+            <returns>Boolean on whether or not a interceptor was configured</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasTypedResponseInterceptors(System.String,Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Checks to see if a typed SyncResponseInterceptor for a specific operation has been configured by the user
+            </summary>
+            <returns>Boolean on whether or not a interceptor was configured</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasTypedConflictInterceptors(System.String)">
+            <summary>
+            Checks to see if any typed SyncConflictInterceptor has been configured by the user
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasTypedConflictInterceptor(System.String,System.Type)">
+            <summary>
+            Checks to see if a typed SyncConflictInterceptor has been configured by the user
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasTypedRequestInterceptor(System.String,System.Type)">
+            <summary>
+            Checks to see if a typed SyncRequestInterceptor for a specific operation has been configured by the user
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.HasTypedResponseInterceptor(System.String,Microsoft.Synchronization.Services.SyncOperations,System.Type)">
+            <summary>
+            Checks to see if a typed SyncResponseInterceptor for a specific operation has been configured by the user
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.InvokeUserInterceptorMethod(System.Reflection.MethodInfo,System.Object,System.Object[])">
+            <summary>
+            Invokes the actual MethodInfo object with the passed in input param. Returns the value of the invocation
+            back to the caller.
+            </summary>
+            <param name="info">MethodInfo to invoke</param>
+            <param name="sourceObject">Instance of user Service on which the interceptor is invoked</param>
+            <param name="inputParams">Input parameters passed to the method</param>
+            <returns>Return value from the invocation.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.ProcessSyncInterceptor(Microsoft.Synchronization.Services.SyncInterceptorAttribute,System.Type,System.Reflection.MethodInfo)">
+            <summary>
+            This method processes a single SyncInterceptorAttribute defined on a method. Processing involves the following
+            1. Ensure that the MethodInfo signature is the right one for the interceptor.
+            2. Retrieve the ScopeNames defined in the attribute and ensure they are valid scopes configures via the 
+            ISyncScopeConfiguration.SetEnableScope() API.
+            3. Create a SyncInterceptorInfoWrapper object for the scope if none is present.
+            4. Add the interceptor to the wrapper object.
+            </summary>
+            <param name="attr">The SyncInterceptorAttribute to process.</param>
+            <param name="syncServiceType">Actual SyncService type</param>
+            <param name="methodInfo">User Method on which the attribute is applied</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.DiscoverTypes(System.Type)">
+            <summary>
+            Reflect the types from T and cache it in a list for reference.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceConfiguration.InvokeStaticInitialization(System.Type)">
+            <summary>
+            Invokes the InitializeService user method.
+            </summary>
+            <param name="type">service type (used for reflection)</param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.diagxslt">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.diagxslt.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.diagxslt.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.diagxslt.diag">
+             <summary>
+               Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+            &lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+                xmlns:msxsl=&quot;urn:schemas-microsoft-com:xslt&quot; exclude-result-prefixes=&quot;msxsl&quot;
+            &gt;
+              &lt;xsl:output method=&quot;html&quot; indent=&quot;yes&quot;/&gt;
+            
+              &lt;xsl:template match=&quot;@* | node()&quot;&gt;
+                &lt;xsl:copy&gt;
+                  &lt;xsl:apply-templates select=&quot;@* | node()&quot;/&gt;
+                &lt;/xsl:copy&gt;
+              &lt;/xsl:template&gt;
+            
+              &lt;xsl:template match=&quot;root&quot;&gt;
+                &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+                  &lt;head runat=&quot;server&quot;&gt;
+                    &lt; [rest of string was truncated]&quot;;.
+             </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncServiceException">
+            <summary>
+            The exception that is thrown when an error occurs while processing
+            a web sync service request.
+            </summary>
+            <remarks>
+            The SyncServiceException is thrown to indicate an error during
+            request processing, specifying the appropriate response for
+            the request.
+            
+            RFC2616 (http://www.ietf.org/rfc/rfc2616.txt) about the status code values:
+                1xx: Informational  - Request received, continuing process
+                "100"  ; Section 10.1.1: Continue
+                "101"  ; Section 10.1.2: Switching Protocols
+                
+                2xx: Success        - The action was successfully received, understood, and accepted
+                "200"  ; Section 10.2.1: OK
+                "201"  ; Section 10.2.2: Created
+                "202"  ; Section 10.2.3: Accepted
+                "203"  ; Section 10.2.4: Non-Authoritative Information
+                "204"  ; Section 10.2.5: No Content
+                "205"  ; Section 10.2.6: Reset Content
+                "206"  ; Section 10.2.7: Partial Content
+                
+                3xx: Redirection    - Further action must be taken in order to complete the request
+                "300"  ; Section 10.3.1: Multiple Choices
+                "301"  ; Section 10.3.2: Moved Permanently
+                "302"  ; Section 10.3.3: Found
+                "303"  ; Section 10.3.4: See Other
+                "304"  ; Section 10.3.5: Not Modified
+                "305"  ; Section 10.3.6: Use Proxy
+                "307"  ; Section 10.3.8: Temporary Redirect
+                
+                4xx: Client Error   - The request contains bad syntax or cannot be fulfilled
+                "400"  ; Section 10.4.1: Bad Request
+                "401"  ; Section 10.4.2: Unauthorized
+                "402"  ; Section 10.4.3: Payment Required
+                "403"  ; Section 10.4.4: Forbidden
+                "404"  ; Section 10.4.5: Not Found
+                "405"  ; Section 10.4.6: Method Not Allowed
+                "406"  ; Section 10.4.7: Not Acceptable
+                "407"  ; Section 10.4.8: Proxy Authentication Required
+                "408"  ; Section 10.4.9: Request Time-out
+                "409"  ; Section 10.4.10: Conflict
+                "410"  ; Section 10.4.11: Gone
+                "411"  ; Section 10.4.12: Length Required
+                "412"  ; Section 10.4.13: Precondition Failed
+                "413"  ; Section 10.4.14: Request Entity Too Large
+                "414"  ; Section 10.4.15: Request-URI Too Large
+                "415"  ; Section 10.4.16: Unsupported Media Type
+                "416"  ; Section 10.4.17: Requested range not satisfiable
+                "417"  ; Section 10.4.18: Expectation Failed
+                
+                5xx: Server Error   - The server failed to fulfill an apparently valid request
+                "500"  ; Section 10.5.1: Internal Server Error
+                "501"  ; Section 10.5.2: Not Implemented
+                "502"  ; Section 10.5.3: Bad Gateway
+                "503"  ; Section 10.5.4: Service Unavailable
+                "504"  ; Section 10.5.5: Gateway Time-out
+                "505"  ; Section 10.5.6: HTTP Version not supported
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.#ctor">
+            <summary>
+            Creates a new instance of the SyncServiceException class.
+            </summary>
+            <remarks>
+            The Message property is initialized to a system-supplied message 
+            that describes the error. The StatusCode property is set to 500
+            (Internal Server Error).
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the DataServiceException class.
+            </summary>
+            <param name="message">Plain text error message for this exception.</param>
+            <remarks>
+            The StatusCode property is set to 500 (Internal Server Error).
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the SyncServiceException class.
+            </summary>
+            <param name="message">Plain text error message for this exception.</param>
+            <param name="innerException">Exception that caused this exception to be thrown.</param>
+            <remarks>
+            The StatusCode property is set to 500 (Internal Server Error).
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.#ctor(System.Int32,System.String)">
+            <summary>
+            Initializes a new instance of the SyncServiceException class.
+            </summary>
+            <param name="statusCode">HTTP response status code for this exception.</param>
+            <param name="message">Plain text error message for this exception.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.#ctor(System.Int32,System.String,System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the SyncServiceException class.
+            </summary>
+            <param name="statusCode">HTTP response status code for this exception.</param>
+            <param name="errorCode">Error code to be used in payloads.</param>
+            <param name="message">Plain text error message for this exception.</param>
+            <param name="innerException">Exception that caused this exception to be thrown.</param>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceException.ErrorCode">
+            <summary>Error code to be used in payloads.</summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceException.ResponseAllowHeader">
+            <summary>'Allow' response for header.</summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncServiceException.StatusCode">
+            <summary>Response status code for this exception.</summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Sets the <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with information about the exception.
+            </summary>
+            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateInternalServerError(System.String)">
+            <summary>
+            Creates a new SyncServiceException to indicate InternalServerError (HTTP 500) error.
+            </summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <returns>A new SyncServiceException to indicate an internal server error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateInternalServerError(System.String,System.Exception)">
+            <summary>
+            Creates a new exception to indicate InternalServerError (HTTP 500) error.
+            </summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <param name="innerException">Inner Exception.</param>
+            <returns>A new SyncServiceException to indicate an internal server error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateBadRequestError(System.String)">
+            <summary>
+            Creates a new SyncServiceException to indicate BadRequest (HTTP 400) error.
+            </summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <returns>A new SyncServiceException to indicate a bad request error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateBadRequestError(System.String,System.Exception)">
+            <summary>
+            Creates a new SyncServiceException to indicate BadRequest (HTTP 400) error.
+            </summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <param name="innerException">Inner Exception.</param>
+            <returns>A new SyncServiceException to indicate a bad request error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateForbidden">
+            <summary>Creates a new "Forbidden" (HTTP 403) exception.</summary>
+            <returns>A new SyncServiceException to indicate that the request is forbidden.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateMethodNotAllowed(System.String,System.String)">
+            <summary>Creates a new "Method Not Allowed" exception.</summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <param name="allow">String value for 'Allow' header in response.</param>
+            <returns>A new SyncServiceException to indicate the requested method is not allowed on the response.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateMethodNotImplemented(System.String)">
+            <summary>
+            Creates a new exception to indicate MethodNotImplemented error.
+            </summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <returns>A new SyncServiceException to indicate a MethodNotImplemented error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateResourceNotFound">
+            <summary>Creates a new "Resource Not Found" (HTTP 404) exception.</summary>
+            <returns>A new SyncServiceException to indicate the requested resource cannot be found.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateResourceNotFound(System.String)">
+            <summary>Creates a new "Resource Not Found" (HTTP 404) exception.</summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <returns>A new SyncServiceException to indicate the requested resource cannot be found.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateNotAcceptable(System.String)">
+            <summary>Creates a new "Not Acceptable" (HTTP 406) exception.</summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <returns>A new SyncServiceException to indicate a NotAcceptable error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateUnsupportedMediaType(System.String)">
+            <summary>Creates a new "Unsupported Media Type" (HTTP 415) exception.</summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <returns>A new SyncServiceException to indicate a UnsupportedMediaType error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreatePreConditionFailed(System.String)">
+            <summary>
+            Creates a new SyncServiceException to indicate Precondition error.
+            </summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <returns>A new SyncServiceException to indicate a Precondition failed error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateSyntaxError">
+            <summary>Creates a new SyncServiceException to indicate a syntax error.</summary>
+            <returns>A new SyncServiceException to indicate a syntax error.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceException.CreateSyntaxError(System.String)">
+            <summary>Creates a new SyncServiceException to indicate a syntax error.</summary>
+            <param name="errorMessage">Plain text error message for this exception.</param>
+            <returns>A new SyncServiceException to indicate a syntax error.</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.IRequestHandler">
+            <summary>
+            Contains the service contract that is implemented by the SyncService.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.IRequestHandler.ProcessRequestForMessage(System.IO.Stream)">
+            <summary>
+            This is a global handler for all incoming requests.
+            
+            Usages: 
+            1. .svc code behind files need to inherit from this class to enable sync methods.
+            2. No endpoints need to be added explicitly to the to the web.config
+            
+            Note: For more details on how service can accept arbitary data. See 
+            http://msdn.microsoft.com/en-us/library/cc656724.aspx 
+            </summary>
+            <param name="messageBody">Message body</param>
+            <returns>The response <see cref="T:System.ServiceModel.Channels.Message"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.IRequestHandler.ProcessRequestToServiceRoot">
+            <summary>
+            This method is invoked when a GET request is made to the service root.
+            We will redirect this request to the /$syncscopes URL which will return a list of scopes.
+            Without this, the service returns a missing operation error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.IRequestHandler.ProcessRequestForDiagnostics">
+            <summary>Processes the diagnostics page request.</summary>
+            <returns>The response <see cref="T:System.ServiceModel.Channels.Message"/>.</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.ConflictResolutionPolicy">
+            <summary>
+            Represents the options for the conflict resolution policy to use for synchronization.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.ConflictResolutionPolicy.ServerWins">
+            <summary>
+            Indicates that the change on the server wins in case of a conflict.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.ConflictResolutionPolicy.ClientWins">
+            <summary>
+            Indicates that the change sent by the client wins in case of a conflict.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncSerializationFormat">
+            <summary>
+            Represents the serialization format to be used for the response.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SyncSerializationFormat.ODataAtom">
+            <summary>
+            Indicates that OData AtomPub is the serialization format.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SyncSerializationFormat.ODataJson">
+            <summary>
+            Indicates that OData JSON is the serialization format.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.RequestCommand">
+            <summary>
+            Represents the type of request as obtained from the incoming request details.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.RequestCommand.UploadChanges">
+            <summary>
+            Indicates an upload changes request type.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.RequestCommand.DownloadChanges">
+            <summary>
+            Indicates a download changes request type.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.RequestCommand.SyncScopes">
+            <summary>
+            Indicates a request type to enumerate scopes.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.RequestCommand.ScopeMetadata">
+            <summary>
+            Indicates a request type to get scope metadata.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncOperations">
+            <summary>
+            Represents the SyncOperations for which a SyncInterceptorAttribute applies to.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SyncOperations.Download">
+            <summary>
+            Represents a Sync DownloadChanges request/response operation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SyncOperations.Upload">
+            <summary>
+            Represents a Sync UploadChanges request/response operation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SyncOperations.All">
+            <summary>
+            Represents a Sync DownloadChanges/UploadChanges request/response operation.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.CommandParamType">
+            <summary>
+            Represents the valid values for the command parameters that are sent as a part of the request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.CommandParamType.ScopeName">
+            <summary>
+            ScopeName that is sent as a part of the request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.CommandParamType.FilterParameters">
+            <summary>
+            Filter parameters sent as a part of the request. This is used for provisioning a new scope.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.HttpContextServiceHost">
+            <summary>
+            Exposes the http headers and other utility methods that act on the HttpRequest class.
+            Also contains a reference to the message body of the incoming request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.RequestStream">
+            <summary>
+            Gets the incoming request stream (message body).
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.HostHeader">
+            <summary>
+            Gets the host header (which contains the host name and port)
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.RequestAccept">
+            <summary>
+            Gets the Http Accepts header.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.RequestHttpMethod">
+            <summary>
+            Gets the http method of the incoming request.
+            We dont handle the X-HTTP-Method header ("verb tunneling") since the only verbs supported are GET and POST.
+            See http://msdn.microsoft.com/en-us/library/dd541471(PROT.10).aspx for more information about the X-HTTP-Method header.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.RequestIfMatch">
+            <summary>
+            The If-Match header, which specifies that the requested operation should be performed
+            only if the client's cached copy of the indicated resource is current.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.RequestIfNoneMatch">
+            <summary>
+            The If-None-Match header, which specifies that the requested operation should be
+            performed only if none of client's cached copies of the indicated resources are current.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.ResponseContentType">
+            <summary>
+            Gets or sets the HTTP Content-Type header value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.ResponseStatusCode">
+            <summary>
+            Gets or sets the HTTP status code of the response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.RequestHeaders">
+            <summary>
+            Gets the protocol headers associated with the incoming request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.ResponseHeaders">
+            <summary>
+            Gets the protocol headers associated with the outgoing response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.RequestUri">
+            <summary>
+            Gets the incoming request uri.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.QueryStringCollection">
+            <summary>
+            Gets a NameValueCollection that contains query string information.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.RelativeUriSegments">
+            <summary>
+            Gets the segments from the request URI.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.ServiceBaseUri">
+            <summary>
+            Get the service base uri.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.HttpContextServiceHost.OutgoingResponse">
+            <summary>
+            Gets the outgoing response context. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.HttpContextServiceHost.#ctor">
+            <summary>Intialize a new instance of the class with a null RequestStream property value.</summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.HttpContextServiceHost.GetQueryStringItem(System.String)">
+            <summary>
+            Get the value for a query string item.
+            </summary>
+            <param name="item">Item to search for in the incoming request uri.</param>
+            <returns>Value of the item.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.HttpContextServiceHost.VerifyQueryParameters">
+            <summary>
+            Verify query parameters for '$' etc.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.HttpContextServiceHost.GetOutputSerializationFormat(Microsoft.Synchronization.Services.SyncSerializationFormat)">
+             <summary>
+             Get the serialization format for the response based on the value of the HTTP Accept header.
+            
+             If $format is not specified then the format comes from the accept header.
+            
+             The order in which a response content-type is chosen is based on the
+             incoming "Accept" header and the types that the service supports.
+             According to the HTTP/1.1 Header Field Definitions RFC
+             (http:///www.w3.org/Protocols/rfc2616/rfc2616-sec14.html), an absence of the
+             Accept header means that the client accepts all response types.
+            
+             Media ranges can be overridden by more specific media ranges, for example:
+             both application/json and application/atom+xml would override */*.
+            
+             Depending on the service configuration application/atom+xml would override application/json
+             if application/atom+xml if the default serialization format, and application/json would
+             override application/atom+xml if the default serialization format is application/json.
+            
+             A client can also send a media range of the following type: application/*, which can be
+             substituted for application/atom+xml or application/json depending on the service configuration.
+            
+             A. If the default configured serialization format is "application/atom+xml"
+            
+              The formats in order of priority are:
+                 1. application/atom+xml
+                 2. application/json
+                 3. application/* or */* substituted with application/atom+xml
+            
+              Examples (order of accept headers doesn't matter):
+                 "application/*" -> ATOM+XML
+                 "application/*,application/JSON" -> JSON
+                 "application/*,application/ATOM+XML" -> ATOM+XML
+                 "application/*,application/ATOM+XML,application/JSON" -> ATOM+XML
+                 "application/JSON" -> JSON
+                 "application/ATOM+XML" -> ATOM+XML
+                 "application/JSON,application/ATOM+XML" -> ATOM+XML
+            
+             B. If the default configured serialization format is "application/json"
+            
+              The formats in order of priority are:
+                 1. application/json
+                 2. application/atom+xml
+                 3. application/* or */* substituted with application/json
+            
+              Examples (order of accept headers doesn't matter):
+                 "application/*" -> JSON
+                 "application/*,application/JSON" -> JSON
+                 "application/*,application/ATOM+XML" -> ATOM+XML
+                 "application/*,application/ATOM+XML,application/JSON" -> JSON
+                 "application/JSON" -> JSON
+                 "application/ATOM+XML" -> ATOM+XML
+                 "application/JSON,application/ATOM+XML" -> JSON
+            
+             Note: headers from firefox need to be trimmed before we make a comparison.In other words the media range
+             parameter as specified in the above RFC are ignored.
+             </summary>
+             <returns>Response serialization format</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.HttpContextServiceHost.GetRequestContentSerializationFormat">
+             <summary>
+             Gets the serialization format of the payload in the incoming request based on the content-type header.
+             According to the HTTP header RFC http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html, the content type
+             has the following format: 
+            
+                     "Content-Type" ":" media-type
+                     media-type     = type "/" subtype *( ";" parameter )
+             
+             We ignore the media-type parameter.
+             </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.HttpContextServiceHost.ValidateRequestHttpVerbAndSegments">
+            <summary>
+            Validate the HTTP Verb for GET/POST and check if the URL matches the allowed format.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.ISyncServiceConfiguration">
+            <summary>
+            Interface that is used to configure service wide policies.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ISyncServiceConfiguration.SetConflictResolutionPolicy(Microsoft.Synchronization.Services.ConflictResolutionPolicy)">
+            <summary>
+            Change the conflict resolution policy. The default value is ClientWins.
+            </summary>
+            <param name="policy">The new conflict resolution policy</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ISyncServiceConfiguration.SetDefaultSyncSerializationFormat(Microsoft.Synchronization.Services.SyncSerializationFormat)">
+            <summary>
+            Change the serialization format. The default value is ODataAtom.
+            </summary>
+            <param name="serializationFormat">serialization format</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ISyncServiceConfiguration.SetEnableScope(System.String)">
+            <summary>
+            Enable scopes. No scopes are enabled by default.
+            </summary>
+            <param name="scopeName">Scope name to enable.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ISyncServiceConfiguration.AddFilterParameterConfiguration(System.String,System.String,System.String,System.Type)">
+            <summary>
+            Add a new filter parameter configuration. This method can be called during service initialization
+            and SqlSyncProvider filter parameter definitions can be added to service configuration.
+            </summary>
+            <param name="queryStringParam">Name of the querystring parameter. This is parsed when changes are requested.</param>
+            <param name="tableName">SQL table name</param>
+            <param name="sqlParameterName">SQL parameter name (has to be exact since its used in query formation)</param>
+            <param name="typeOfParam">
+            Indicates the Type of the parameter. This is used to change the value of the query string parameter to the 
+            type requested by the SqlParameter type.
+            </param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ISyncServiceConfiguration.SetBatchSpoolDirectory(System.String)">
+            <summary>
+            Set the path where batches will be spooled. The directory must already exist. Default directory is %TEMP%.
+            </summary>
+            <param name="directoryPath">Path to the batch spooling directory.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ISyncServiceConfiguration.SetDownloadBatchSize(System.UInt32)">
+            <summary>
+            Set a download batch size. Batching is disabled by default.
+            This indicates the size with which data is batched. The size of the actual response will be greater due to the 
+            OData elements that take extra space.
+            </summary>
+            <param name="batchSizeInKB">Download batch size in KB</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ISyncServiceConfiguration.SetSyncObjectSchema(System.String)">
+            <summary>
+            Set the schema name under which sync related objects were generated in the SQL database when the database was provisioned.
+            Note: This setting applies to only objects that were created by the sync framework. The schema name of the individual tables
+            is included in the TableName property of the SyncEntityTypeAttribute class.
+            </summary>
+            <param name="schemaName">Name of the schema under which sync related objects are created.</param>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.ISyncServiceConfiguration.ServerConnectionString">
+            <summary>
+            Gets/Sets the server connection string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.ISyncServiceConfiguration.UseVerboseErrors">
+            <summary>
+            Gets/Sets the error level for sync operations. Default value is false.
+            If true - detailed error information is returned in the response. 
+            This can be used for debugging.
+            </summary>
+            <remarks>For production deployments set this to false.</remarks>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.ISyncServiceConfiguration.IsBatchingEnabled">
+            <summary>
+            Indicates if batching is enabled on the provider service.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.ISyncServiceConfiguration.EnableDiagnosticPage">
+            <summary>Enable or disable the diagnostic page served by the $diag URL.</summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.Request">
+            <summary>
+            Desribes an incoming request and contains all necessary data needed to process the request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Request.RequestCommand">
+            <summary>
+            Indicates the type of request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Request.CommandParams">
+            <summary>
+            This is a dictionary of parameters that will be required to process a request. 
+            The keys in the dictionary are of type CommandParamType
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Request.SyncBlob">
+            <summary>
+            Blob that is passed to the client for every upload and download request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Request.EntityList">
+            <summary>
+            List of entities parsed from the incoming request payload.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Request.ProviderParams">
+            <summary>
+            Contains the filter parameters used by the provider.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Request.ResponseSerializationFormat">
+            <summary>
+            Gets/sets the serialization format for the outgoing response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.Request.IdToTempIdMapping">
+            <summary>
+            Contains the mapping between the entity id and the tempId. This is used
+            when writing upload responses for inserts, conflicts and errors.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.RequestParser">
+            <summary>
+            This class encapsulates logic related to parsing the incoming HttpRequest and the message body.
+            It identifies the type of request and collects all the necessary information to process the request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.RequestParser.GetScopeName">
+            <summary>
+            Gets the scope name from the query string.
+            </summary>
+            <returns>scope name</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.RequestParser.GetFilterParamsFromIncomingRequest(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Gets the filter parameters from the query string. This excludes the system parameters such as 'syncscope', 'operation' etc.
+            </summary>
+            <param name="queryStringCollection">Query string</param>
+            <returns>Dictionary of filter parameters</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.RequestParser.GetCommandParameters(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Get a dictionary that contains command parameters.
+            </summary>
+            <param name="queryStringCollection">Querystring represented as a NameValueCollection</param>
+            <returns>Dictionary of command parameter types and values.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.RequestParser.GetRequestCommandType">
+            <summary>
+            Gets the current request type.
+            </summary>
+            <returns>Request command type</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.RequestParser.ReadIncomingRequestDetails">
+            <summary>
+            Read request details for Download/upload operations.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.RequestParser.ReadIncomingRequestStreamForPost">
+            <summary>
+            Read and parse the incoming request stream for a POST request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.RequestParser.ReadIncomingRequestStreamForGet">
+            <summary>
+            Read and parse the incoming request details for a DownloadChanges GET request.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.DelegateBodyWriter">
+            <summary>
+            Custom body writer for writing output response.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.DownloadChangesRequestProcessor">
+            <summary>
+            Handler for the download changes request command.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DownloadChangesRequestProcessor.ProcessRequest(Microsoft.Synchronization.Services.Request)">
+            <summary>
+            Process the incoming request and forms a formatted outgoing response.
+            </summary>
+            <param name="incomingRequest">Incoming request</param>
+            <returns>Message instance containing the outgoing response</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DownloadChangesRequestProcessor.PrepareAndProcessResponseInterceptors">
+            <summary>
+            Function that is used to check and fire the DownloadResponse interceptors code.
+            It check to see if it has non typed interceptors and if yes then invokes it. Else it
+            checks it any typed filter exists for the current entites being sent back and invokes them.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.IRequestProcessor.ProcessRequest(Microsoft.Synchronization.Services.Request)">
+            <summary>
+            Process the incoming request and forms a formatted outgoing response.
+            </summary>
+            <param name="incomingRequest">Incoming request</param>
+            <returns>Message instance containing the outgoing response</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.ScopeSchemaRequestProcessor">
+            <summary>
+            Handler for the $metadata request command.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ScopeSchemaRequestProcessor.ProcessRequest(Microsoft.Synchronization.Services.Request)">
+            <summary>
+            Process the $metadata request and return the xml description as per the sync protocol specification.
+            </summary>
+            <param name="incomingRequest">incoming request object.</param>
+            <returns>WCF Message object that contains the output xml.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.ScopeSchemaRequestProcessor.GetMetadataDocument">
+            <summary>
+            Get the metadata document as per sync specification for $metadata.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncRequestProcessorBase.InitRequestOperationContext">
+            <summary>
+            Virtual function that will be overriden by request processors that has Interceptors and needs
+            a context object to encapsulate all request info.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncRequestProcessorBase.InitResponseOperationContext">
+            <summary>
+            Virtual function that will be overriden by request processors that has Interceptors and needs
+            a context object to encapsulate all response info.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncRequestProcessorBase.WriteResponse(System.Xml.XmlDictionaryWriter,Microsoft.Synchronization.Services.Formatters.SyncWriter)">
+            <summary>
+            Delegate passed into the custom body writer to form the outgoing response.
+            </summary>
+            <param name="writer"></param>
+            <param name="syncWriter"></param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncScopesRequestProcessor">
+            <summary>
+            Handler for processing the GetScopes request ($syncscopes).
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncScopesRequestProcessor.ProcessRequest(Microsoft.Synchronization.Services.Request)">
+            <summary>
+            Process the GetScopes ($syncscopes) request and return the xml description as per the sync protocol specification.
+            </summary>
+            <param name="incomingRequest">incoming request object.</param>
+            <returns>WCF Message object that contains the output xml.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncScopesRequestProcessor.GetScopeListInfo">
+            <summary>
+            Get the XDocument that contains scope list information as described by the $syncscopes specification.
+            </summary>
+            <returns>XDocument object that has the scopes list as per the $syncscopes specification.</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.UploadChangesRequestProcessor">
+            <summary>
+            Handler for the upload changes request command.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.UploadChangesRequestProcessor._incomingNewInsertEntities">
+            <summary>
+            This field contains the list of clent inserts that were successfully processed.
+            As and when a Conflict/Error occures or the user rejects an entity that was an insert
+            then the item is removed from this collection. At the end this collection will give us a
+            easy way of passing to the UploadResponseOperationContext.OutgoingChanges property.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.UploadChangesRequestProcessor.ProcessRequest(Microsoft.Synchronization.Services.Request)">
+            <summary>
+            Process the incoming request and forms a formatted outgoing response.
+            </summary>
+            <param name="incomingRequest">Incoming request</param>
+            <returns>Message instance containing the outgoing response</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.UploadChangesRequestProcessor.PrepareAndProcessRequestInterceptor">
+            <summary>
+            Function that initializes the SyncUploadRequestContext and then invokes user interceptor code
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.UploadChangesRequestProcessor.PrepareAndProcessResponseInterceptor(Microsoft.Synchronization.Services.IAsymmetricProviderService)">
+            <summary>
+            Function that initializes the SyncUploadResponseContext and then invokes user interceptor code
+            </summary>
+            <param name="providerService">SqlSyncProviderService instance</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.UploadChangesRequestProcessor.ClientChangeFailedToApply(Microsoft.Synchronization.Services.IOfflineEntity)">
+            <summary>
+            This is called for every conflict/error with the client entity. 
+            We use this function to check if the error was a client insert and if yes then remove it from
+            the list of _incomingNewInsertEntities. This way we know which entities are successful uploads so
+            we can pass this info to the UploadResponseInterceptor.OutgoingChanges list.
+            </summary>
+            <param name="entity">The client version of the entity. We match the actual reference via its primary key</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.UploadChangesRequestProcessor.CheckForRejectedEntities(System.Collections.Generic.Dictionary{Microsoft.Synchronization.Services.IOfflineEntity,System.String})">
+            <summary>
+            Iterates over the rejected entities and removes them from the Entities to be sent to the database.
+            </summary>
+            <param name="rejects">rejected entities</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.UploadChangesRequestProcessor.ProcessRejectedEntities(Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService)">
+            <summary>
+            This function loops the rejected entites and sends back a SyncError for each entity. For each entity it does the following
+            1. Retrieve the current version in server.
+            1.a If its null then it copies the primary key to a new object and marks it as tombstone.
+            2. Adds the SyncError to existing list of SyncErrors.
+            </summary>
+            <param name="sqlProvider"></param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.UploadChangesRequestProcessor.AssignRealIdsForClientInserts(System.Collections.Generic.IList{Microsoft.Synchronization.Services.IOfflineEntity})">
+            <summary>
+            This is a common place where a real id is assigned to all client inserts.
+            </summary>
+            <param name="clientUploads">Collection of entities to check</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.UploadChangesRequestProcessor.GetEntityFromIncomingRequest(System.Collections.Generic.Dictionary{System.String,Microsoft.Synchronization.Services.IOfflineEntity},Microsoft.Synchronization.Services.IOfflineEntity,System.Boolean)">
+            <summary>
+            Get the entity from the incoming request that matches the primary key string of the entity passed as a parameter.
+            </summary>
+            <param name="primaryKeyToIncomingEntitiesMapping">Dictionary of mapping between primary key and the actual entities from incoming request.</param>
+            <param name="entity">Entity for which to search a match in the incoming request.</param>
+            <param name="isConflict">Indicates if this is called during conflict processing. Used to select appropriate error messages.</param>
+            <returns>Entity from the incoming request.</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.ApplyChangesResponse">
+            <summary>
+            This class represnts the ouput of the ApplyChanges method of the IAsymmetricProviderService implementation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.ApplyChangesResponse.Conflicts">
+            <summary>
+            List of conflicts and associated data.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.ApplyChangesResponse.Errors">
+            <summary>
+            List of errors.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter">
+            <summary>
+            Converts DataSet to IOfflineEntity list and vice versa.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter._localToGlobalPropertyMapping">
+            <summary>
+            The _localToGlobalPropertyMapping and _globalToLocalPropertyMapping holds the localname - globalName
+            mapping info for a given IOfflineEntity. If an IOfflineEntity has any SyncEntityPropertyMappingAttribute 
+            annotating its properties then they will contain the mapping else this will be always empty dictionary. 
+            LocalName represents the backend store name for that particular field/column
+            GlobalName represents the actual property name which is being referenced on the wire.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.ConvertEntitiesToDataSet(System.Collections.Generic.List{Microsoft.Synchronization.Services.IOfflineEntity})">
+            <summary>
+            Convert from a list of OfflineCapableEntities to a dataset.
+            </summary>
+            <param name="entities">Entity list</param>
+            <returns>Dataset which contains all data from the entity list.</returns>
+            <exception cref="T:Microsoft.Synchronization.Services.SyncServiceException">For an unknown type that is passed in the input.</exception>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.GetSelectScriptForType(System.Type)">
+            <summary>
+            Utility function to get the SELECT command for a given entity type.
+            This will return a command of format SELECT [Fieldname1, FieldName2] from [TableName] WHERE PK1 = @PK1 [AND PK2= @pk2]
+            where FieldNameN is the actual columns included in the scope
+            </summary>
+            <param name="t">Entity type</param>
+            <returns>TSQL Select command text</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.GetTableNameForType(System.Type)">
+            <summary>
+            Utility to get tablename for a given entity type
+            </summary>
+            <param name="t">Entity type</param>
+            <returns>Table name</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.CopyEntityToDataRow(Microsoft.Synchronization.Services.IOfflineEntity,System.Data.DataTable)">
+            <summary>
+            Copies the individual properties from the entity back in to the DataTable's first row.
+            This should be used only when merging a user conflict resolution back in to a DataRow.
+            This returns the merged results as an object array
+            </summary>
+            <param name="entity">Entity from which to read values</param>
+            <param name="table">The Table whose first DataRow will be updated.</param>
+            <returns>The contents of the DataRow as an object array</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.MergeChangeInToDataSet(System.Data.DataTable,System.Data.DataRow,System.Object[],System.Type)">
+            <summary>
+            This method will try to locate the passed in DataRow's key values in the destination DataTable
+            and if found will update its values with the new values passed.
+            </summary>
+            <param name="destinationTable">Table to make the merge in</param>
+            <param name="rowToMatch">Row whose keys to match in destination table</param>
+            <param name="rowvalues">Values to override</param>
+            <param name="entityType">Entity type for the DataRow</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.ConvertDataSetToEntities(System.Data.DataSet)">
+            <summary>
+            Convert a dataset to a list of OfflineCapableEntities.
+            </summary>
+            <param name="dataSet">DataSet that contains entity information.</param>
+            <returns>List of OfflineCapabeEntities that contain the information from the dataset.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.BuildPropertyMappingInfo(System.Type)">
+            <summary>
+            Inspects a type to see if it contains any SyncEntityPropertyMappingAttribute custom attribute
+            and if present builds a localToGlobal and globalToLocal name mappings.
+            </summary>
+            <param name="type"></param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.IsSyncSpecificColumn(System.String)">
+            <summary>
+            Checks if the given column name was created by the SqlSyncProvider.
+            </summary>
+            <param name="columnName">Column name to check</param>
+            <returns>True - if sync created column, false - otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.DataSetToEntitiesConverter.IsOfflineEntityServiceProperty(System.Type)">
+            <summary>
+            Checks if the property is a sync service specific property.
+            For example: the OfflineEntityMetadata type is used to store metadata about each entity
+            and is not a part of the underlying datastore.
+            </summary>
+            <param name="propertyType">Type of the property</param>
+            <returns>True - if property is service specific, False - otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SqlProvider.SqlEdition">
+            <summary>
+            SqlEdition - enum for different SQL Server versions
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SqlProvider.SqlEdition.Sql2008">
+            <summary>
+            2008 = Major version 10
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SqlProvider.SqlEdition.Sql2005">
+            <summary>
+            2005 = Major version 9
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SqlProvider.SqlEdition.SqlAzure">
+            <summary>
+            Azure
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SqlProvider.SqlEditionHelper">
+            <summary>
+            SqlEditionHelper
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlEditionHelper.GetEdition(System.Data.SqlClient.SqlConnection,System.Data.SqlClient.SqlTransaction)">
+            <summary>
+            Returns the edition of the SQL Server to which connection object is connected
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlEditionHelper.OpenConnection(System.Data.IDbConnection)">
+            <summary>
+            OpenConnection - opens the passed in connection
+            </summary>
+            <param name="connection">The connection to open</param>
+            <returns>True if the connection needed to be opened, False if it was already open</returns>        
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlEditionHelper.RetryLitmus(System.Data.SqlClient.SqlException)">
+            <summary>
+            Determine from the exception if the execution of the connection should be attempted again.  
+            The 3 error codes below are the only exceptions listed as retryable(when opening a connection) 
+            in the Sql Azure guidelines listed here: 
+            http://blogs.msdn.com/b/sqlazure/archive/2010/05/11/10011247.aspx
+            </summary>
+            <param name="sqlException">SqlException to parse</param>
+            <returns>True if a a retry is needed, false if not</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderFilterParameterInfo">
+            <summary>
+            This class contains information about filter parameters that are used for provisioning a 
+            scope from a template using the SqlSyncProvider class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderFilterParameterInfo.QueryStringKey">
+            <summary>
+            Represents a query string parameter key.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderFilterParameterInfo.TableName">
+            <summary>
+            Table name for which the filter parameter values are being assigned. (example: Customer, Orders etc).
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderFilterParameterInfo.SqlParameterName">
+            <summary>
+            Name of the filter parameter. 
+            This must be syntactically correct as the SqlSqlProvider directly uses this in SQL queries. (example: @UserId).
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderFilterParameterInfo.Value">
+            <summary>
+            Value of the parameter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderFilterParameterInfo.ValueType">
+            <summary>
+            Gets/sets the type of the Value property. 
+            The Value property is converted to this type before it is assigned to the SqlParameter object.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService">
+            <summary>
+            Implements the GetChanges and ApplyChanges method using the SqlSyncProvider.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService._conflictToSyncEntityIdMapping">
+            <summary>
+            This dictionary is used to save the SyncId of conflicting rows. 
+            We use it after applying all changes (after all ApplyChangeFailed events have been fired and handled)
+            to add positive exceptions to the client knowledge. This will avoid sending the change
+            back to the client on the next download changes request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService._syncEntityIdToConflictMapping">
+            <summary>
+            Contains the mapping between the entity SyncId (for all conflicts detected in change application) and the SyncConflict instances
+            This is used for fast lookup based on the SyncId.
+            There is a 1:1 mapping between this member variable and _conflictToSyncEntityIdMapping.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService._serverTickCountAfterResolvingAllConflicts">
+            <summary>
+            This variable will contain the value of @@DBTS or get_new_rowversion (for SQL Azure) and is used to create knowledge
+            for individual entities that caused conflicts.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.#ctor(Microsoft.Synchronization.Services.SyncServiceConfiguration,System.String,System.Collections.Generic.List{Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderFilterParameterInfo},Microsoft.Synchronization.Services.SyncOperationContext,Microsoft.Synchronization.Services.Batching.IBatchHandler)">
+            <summary>
+            Creates a new instance of the <see cref="T:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService" /> class. Also uses the batch handler passed as parameter if it is not null.
+            </summary>
+            <param name="configuration">Sync configuration</param>
+            <param name="serverScope">Server scope/template</param>
+            <param name="filterParams">Filter parameters. Pass null for no filter parameters.</param>
+            <param name="operationContext">SyncOperationContext object to create the SyncConflictContext object.</param>
+            <param name="batchHandler">Batch Handler for spooling and retrieving batches.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.#ctor(Microsoft.Synchronization.Services.SyncServiceConfiguration,System.String,System.Collections.Generic.List{Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderFilterParameterInfo},Microsoft.Synchronization.Services.SyncOperationContext)">
+            <summary>
+            Constructor that uses the FileBasedBatchHandler.
+            </summary>
+            <param name="configuration">Sync configuration</param>
+            <param name="serverScope">Server scope/template</param>
+            <param name="filterParams">Filter parameters. Pass null for no filter parameters.</param>
+            <param name="operationContext">SyncOperationContext object to create the SyncConflictContext object.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.GetCurrentServerVersionForEntities(System.Collections.Generic.IEnumerable{Microsoft.Synchronization.Services.IOfflineEntity})">
+            <summary>
+            This method is used to retrieve the current data stored for a Entity in the database. This is used by the runtime to 
+            detect the current values for a row that is being skipped due to data errors.
+            </summary>
+            <param name="entities">Entities whose current server version is required</param>
+            <returns>Server version or null if entity doesnt exist in database.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.GetCurrentServerVersionForEntities(System.Collections.Generic.IEnumerable{Microsoft.Synchronization.Services.IOfflineEntity},System.Data.SqlClient.SqlConnection,System.Data.SqlClient.SqlTransaction)">
+            <summary>
+            This method is used to retrieve the current data stored for a Entity in the database. This is used by the runtime to 
+            detect the current values for a row that is being skipped due to data errors.
+            </summary>
+            <param name="entities">Entities whose current server version is required</param>
+            <param name="connection">SqlConnection to use for reading from the database</param>
+            <param name="transaction">SqlTransaction to use when reading from the database</param>
+            <returns>Server version or null if entity doesnt exist in database.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.GetChanges(System.Byte[],System.Guid,System.Guid)">
+            <summary>
+            Gets the next batch of changes for a client.
+            </summary>
+            <param name="serverBlob">Client knowledge as byte[]</param>
+            <param name="batchCode">batchcode for the batch</param>
+            <param name="nextBatchSequenceNumber">Sequence number of the next batch</param>
+            <returns>Response containing the new knowledge and the list of changes.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.GetChanges(System.Byte[])">
+            <summary>
+            Get changes for a client using the knowledge that is passed in.
+            </summary>
+            <param name="serverBlob">Client knowledge as byte[]</param>
+            <returns>Response containing the new knowledge and the list of changes.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.ApplyChanges(System.Byte[],System.Collections.Generic.List{Microsoft.Synchronization.Services.IOfflineEntity})">
+            <summary>
+            Apply changes sent by a client to the server.
+            </summary>
+            <param name="serverBlob">Blob sent in the incoming request</param>
+            <param name="entities">Changes from the client</param>
+            <returns>Response containing the new knowledge and conflict/error information.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.GetRowSorter(Microsoft.Synchronization.SyncKnowledge)">
+            <summary>
+            Get a new instance of the RowSorter class using the knowledge passed as a parameter. 
+            This is used to pull out sorted batches with learned knowledge to send to the client.
+            </summary>
+            <param name="clientKnowledge">Knowledge to initialize the RowSorter instance.</param>
+            <returns>An instance of the RowSorter class.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.SaveBatchesAndReturnFirstBatch(Microsoft.Synchronization.Data.RowSorter)">
+            <summary>
+            Pull out sorted batches from the RowSorter instance and save them using the IBatchHandler implementation.
+            Also return the first batch as an output.
+            </summary>
+            <param name="rowSorter">RowSorter instance.</param>
+            <returns>The first batch pulled from the RowSorter.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.GetSyncKnowledgeFromBlob(System.Byte[])">
+            <summary>
+            Deserialize the blob passed in as a parameter or create new knowledge if the blob is null.
+            </summary>
+            <param name="clientKnowledgeBlob">Serialized knowledge blob</param>
+            <returns>New SyncKnowledge instance if the blob is null or a deserialized instance of the blob.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.SqlSyncProviderChangesApplied(System.Object,Microsoft.Synchronization.Data.DbChangesAppliedEventArgs)">
+            <summary>
+            Handler for the ChangesApplied event of the SqlSyncProvider class. This event is raised after the changes are 
+            applied but before the SqlTransaction is committed. We use this event to read the server timestamp (@@DBTS/get_new_rowversion())
+            and use this to generate positive exceptions in the knowledge that is sent back in the response.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.SqlSyncProviderApplyChangeFailed(System.Object,Microsoft.Synchronization.Data.DbApplyChangeFailedEventArgs)">
+            <summary>
+            Handler for the ApplyChangedFailed event of the SqlSyncProvider class. This is used to record
+            conflict information and apply the service conflict resolution policy.
+            </summary>
+            <param name="sender">Sender object</param>
+            <param name="e">Event args</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.RemoveEntityFromConflictCollection(System.String,Microsoft.Synchronization.Services.IOfflineEntity)">
+            <summary>
+            Remove an entity from a conflicts collection. The conflicts collection contains all the 
+            SyncConflict instances that are detected when applying changes to the server.
+            </summary>
+            <param name="tableName">Global table name of the entity</param>
+            <param name="entity">Entity to remove from the conflicts collection</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.GenerateSyncIdForConflictingEntity(System.String,Microsoft.Synchronization.Services.IOfflineEntity)">
+            <summary>
+            Generate and save the SyncId of the LiveEntity. 
+            This value is used later after all changes are applied to project on the latest 
+            server knowledge and add positive exceptions to the updated client knowledge that is sent in the response.
+            </summary>
+            <param name="tableName">Table name that the entity represents</param>
+            <param name="c">Conflicting entity for which we need to save the SyncId.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.GetUserConflictResolution(Microsoft.Synchronization.Data.DbApplyChangeFailedEventArgs,System.Reflection.ConstructorInfo,System.Type)">
+            <summary>
+            Invokes the users Conflict Interceptor and returns back with a resolution.
+            </summary>
+            <param name="e">Actual event args</param>
+            <param name="constructorInfo">ConstructorInfo object</param>
+            <param name="entityType">Entity type of the conflict</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.CreateNewScopeForClient">
+            <summary>
+            Create a new scope for a client. This method is called when GetChanges is passed a null blob.
+            The requested scope is compared to an existing scope or a template and a new scope is provisioned
+            If the requested scope is an existing template, filter parameters, if present, are added when provisioning.
+            
+            Note: If both scope and template match the requested scope, we prefer the scope. We would need to expose this 
+            out to the service if we want to make this choice configurable.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.CheckIfScopeExists">
+            <summary>
+            Check if a scope exists.
+            </summary>
+            <returns>True - if the scope exists, false - otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.AddSyncColumnsToDataSet(System.Data.DataSet,System.UInt64)">
+            <summary>
+            Add Sync related columns to the dataset. 
+            
+            These are:
+             DbSyncSession.SyncCreatePeerKey
+             DbSyncSession.SyncCreatePeerTimestamp
+             DbSyncSession.SyncUpdatePeerKey
+             DbSyncSession.SyncUpdatePeerTimestamp
+            </summary>
+            <param name="changes">Dataset to which columns need to be added.</param>
+            <param name="tickCount">New tickcount to use when creating versions.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.RemoveSyncVersionColumns(System.Data.DataSet)">
+            <summary>
+            Remove sync related columns from the DataSet.
+            </summary>
+            <param name="dataSet">DataSet from which sync related columns should be removed.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.RemoveTombstoneRowsFromDataSet(System.Data.DataSet)">
+            <summary>
+            Remove all rows which are marked deleted in a dataset.
+            </summary>
+            <param name="dataSet">DataSet from which to remove all deleted rows.</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.AddConflictItemsKnowledgeToClientKnowledge(Microsoft.Synchronization.SyncKnowledge,Microsoft.Synchronization.SyncKnowledge)">
+            <summary>
+            The way the current P2P provider works, versions are bumped up when conflicts are resolved on the server.
+            This would result in us sending the changes to the client on the next download request. We want
+            to not enumerate that change again. So one solution is to get the server knowledge after all changes are applied and then
+            project the knowledge of each conflict and add it as a positive exception to the updated client knowledge.
+            </summary>
+            <param name="updatedClientKnowledge">Knowledge that is going to be sent to the client in the response</param>
+            <param name="serverKnowledge">Server knowledge after applying changes</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SqlProvider.SqlSyncProviderService.CreateSqlSyncProviderInstance(System.String,System.String,System.String)">
+            <summary>
+            Create a new instance of the SqlSyncProvider class.
+            </summary>
+            <param name="clientScopeName">Scope name</param>
+            <param name="serverConnectionString">Connection string</param>
+            <param name="syncObjectSchema">Schema for sync objects</param>
+            <returns>Instance of <see cref="T:Microsoft.Synchronization.Data.SqlServer.SqlSyncProvider" /> class.</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.GetChangesResponse">
+            <summary>
+            This class represnts the ouput of the GetChanges method of the IAsymmetricProviderService implementation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.GetChangesResponse.EntityList">
+            <summary>
+            List of entities.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.ChangeResponse.ServerBlob">
+            <summary>
+            Blob created by the provider that contains knowledge and other provider specific items.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.ChangeResponse.IsLastBatch">
+            <summary>
+            Indicates if this is the last batch of the sequence.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.IAsymmetricProviderService">
+            <summary>
+            Interface that should be implemented by an asymmetric provider. This defines the basic operations that
+            need to be supported by the custom provider so that the asymmetric service can call into it for processing requests.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.IAsymmetricProviderService.GetChanges(System.Byte[])">
+            <summary>
+            Get the list of changes for a client using the knowledge that is passed in.
+            </summary>
+            <param name="serverBlob">Client knowledge as byte[]</param>
+            <returns>Response containing the new knowledge and the list of changes.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.IAsymmetricProviderService.ApplyChanges(System.Byte[],System.Collections.Generic.List{Microsoft.Synchronization.Services.IOfflineEntity})">
+            <summary>
+            Apply changes sent by a client to the server.
+            </summary>
+            <param name="clientKnowledgeBlob">Client knowledge as byte[]</param>
+            <param name="entities">Changes from the client</param>
+            <returns>Response containing the new knowledge and conflict/error information.</returns>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncBlob.NextBatch">
+            <summary>
+            The next batch number.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncConflictInterceptorAttribute">
+            <summary>
+            Represents the attribute used to intercept client-server conflicts when processing
+            client uploads.
+            Applicable on any public method in the SyncService&lt;T&gt; subclass matching the signature
+            public SyncConflictResolution MethodName(SyncConflictContext context, out IOfflineEntity mergedEntity)
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncConflictInterceptorAttribute.#ctor(System.String)">
+            <summary>
+            Instantiates a new instance of the SyncConflictInterceptorAttribute with the specified
+            list of scopeNames to which the interceptor applies
+            </summary>
+            <param name="scopeNames"></param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncDownloadResponseOperationContext">
+            <summary>
+            Represents the DownloadChanges response operation and its associated metadata
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncDownloadResponseOperationContext.IsLastBatch">
+            <summary>
+            Flag denoting whether this response is the last in the set of changes being sent to client
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncDownloadResponseOperationContext.OutgoingChanges">
+            <summary>
+            Represents the changes being downloaded by the client.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncDownloadResponseOperationContext.#ctor">
+            <summary>
+            Internal constructor to prevent public instantiation
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncEntityPropertyMappingAttribute">
+            <summary>
+            Attribute used to indicate a mapping between an entity property and its backend
+            store name. For instance a relational store using id_field as the database name might choose
+            to represent the property as Id instead of using the store specific name. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncEntityPropertyMappingAttribute.LocalName">
+            <summary>
+            The local sotre name for the specific property
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncEntityPropertyIsNullableAttribute">
+            <summary>
+             Attribute used to indicate whether a specific property of a sync entity class is nullable or not. 
+             A property marked with the SyncEntityPropertyNullable attribute is nullable in the underlying storage.
+             This is useful for data types such as 'string' which is nullable by default.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncEntityTypeAttribute">
+            <summary>
+            Attribute to be used for each class that is a sync entity.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncEntityTypeAttribute.TableGlobalName">
+            <summary>
+            This is the global name assigned to a table in the database. 
+            Note: Two tables cannot have the same global name.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncEntityTypeAttribute.TableLocalName">
+            <summary>
+            Underlying quoted table name. This is the actual table name in the database.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncEntityTypeAttribute.KeyFields">
+            <summary>
+            Method/property that is used to retrieve the collection.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncScopeAttribute">
+            <summary>
+            Attribute to be used for the class that is a representation of a scope on the server.
+            This class is passed to SyncService
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncInterceptorAttribute">
+            <summary>
+            This is the base class for all Sync operation interceptors.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorAttribute.#ctor(System.String,Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Creates a new SyncInterceptorAttribute for the specifed ScopeName and SyncOperations
+            </summary>
+            <param name="scopeNames">List of comma delimited sync scope names</param>
+            <param name="operation">SyncOperations to which the interceptor applies.</param>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncInterceptorAttribute.ScopeName">
+            <summary>
+            Gets the ScopeName[s] to which the interceptor applies.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncInterceptorAttribute.Operation">
+            <summary>
+            Gets the SyncOperations for which the interceptor applies
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncInterceptorAttribute.EntityType">
+            <summary>
+            This represents the filtered entity type for which this interceptor has to be fired.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper">
+            <summary>
+            Utility cache class that holds information on the list of configured SyncOperationInterceptor for a scope.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.AddInterceptor(Microsoft.Synchronization.Services.SyncInterceptorAttribute,System.Reflection.MethodInfo,System.String)">
+            <summary>
+            Adds the MethodInfo signature for the specified interceptor type and operation. This
+            method also ensures that the interceptor is valid and is not a duplicate entry before 
+            adding it.
+            </summary>
+            <param name="attr">Interceptor Attribute</param>
+            <param name="info">MethodInfo signature</param>
+            <param name="className">ClassName for error messages</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasRequestInterceptor(Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Utility function to check if a request interceptor is configured
+            </summary>
+            <param name="operation">SyncOperations</param>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasResponseInterceptor(Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Utility function to check if a response interceptor is configured
+            </summary>
+            <param name="operation">SyncOperations</param>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasConflictInterceptor">
+            <summary>
+            Utility function to check if a conflict interceptor is configured
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasRequestInterceptor(System.Type)">
+            <summary>
+            Utility function to check if a request interceptor for the specific type is configured
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasResponseInterceptor(Microsoft.Synchronization.Services.SyncOperations,System.Type)">
+            <summary>
+            Utility function to check if a response interceptor for the specific type is configured
+            </summary>
+            <param name="operation">SyncOperations</param>
+            <param name="type">Type requested</param>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasConflictInterceptor(System.Type)">
+            <summary>
+            Utility function to check if a conflict interceptor for the specific type is configured
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasTypedConflictInterceptors">
+            <summary>
+            Utility function to check if any typed conflict interceptor is configured
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.GetRequestInterceptor(System.Type)">
+            <summary>
+            Returns the request interceptor MethodInfo for specific Type
+            </summary>
+            <param name="type">Type</param>
+            <returns>MethodInfo</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.GetResponseInterceptor(Microsoft.Synchronization.Services.SyncOperations,System.Type)">
+            <summary>
+            Returns the response interceptor MethodInfo for specific Type
+            </summary>
+            <param name="operation">SyncOperations</param>
+            <param name="type">Type</param>
+            <returns>MethodInfo</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.GetConflictInterceptor(System.Type)">
+            <summary>
+            Returns the conflict interceptor MethodInfo for specific Type
+            </summary>
+            <param name="type">Type</param>
+            <returns>MethodInfo</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasTypedRequestInterceptors">
+            <summary>
+            Function that returns if any filtered request interceptors are configured
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncInterceptorsInfoWrapper.HasTypedResponseInterceptors(Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Function that returns if any filtered response interceptors are configured
+            </summary>
+            <param name="operation">SyncOperations</param>
+            <returns>bool</returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncOperationContext">
+            <summary>
+            Represents the current sync operation being processed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncOperationContext.ScopeName">
+            <summary>
+            Gets the ScopeName of the sync operation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncOperationContext.RequestHeaders">
+            <summary>
+            Gets the request headers for the operation
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncOperationContext.Operation">
+            <summary>
+            Gets the SyncOperations kind of the current operation being processed
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncOperationContext.ResponseHeaders">
+            <summary>
+            Gets the response headers for the operation
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncOperationContext.QueryString">
+            <summary>
+            Gets the collection of the HTTP request query string parameters
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncOperationContext.#ctor">
+            <summary>
+            Internal constructor to prevent public instantiation
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncRequestInterceptorAttribute">
+            <summary>
+            Represents the attribute used to intercept all sync operation incoming requests. 
+            Applicable on any public method in the SyncService&lt;T&gt; subclass matching the signature
+            public void MethodName(SyncOperationContext context)
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncRequestInterceptorAttribute.#ctor(System.String,Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Creates a new SyncRequestInterceptorAttribute for the specifed ScopeName and SyncOperations to which the interceptor applies.
+            </summary>
+            <param name="scopeNames">List of comma delimited sync scope names</param>
+            <param name="operation">SyncOperations to which the interceptor applies.</param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncResponseInterceptorAttribute">
+            <summary>
+            Represents the attribute used to intercept all sync operation outgoing responses.
+            Applicable on any public method in the SyncService&lt;T&gt; subclass matching the signature
+            public void MethodName(SyncOperationContext context)
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncResponseInterceptorAttribute.#ctor(System.String,Microsoft.Synchronization.Services.SyncOperations)">
+            <summary>
+            Creates a new SyncInterceptorAttribute for the specifed ScopeName and SyncOperations to which the interceptor applies.
+            </summary>
+            <param name="scopeNames">List of comma delimited sync scope names</param>
+            <param name="operation">SyncOperations to which the interceptor applies.</param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.OnEndSyncRequestEventArgs">
+            <summary>
+            Arguments for OnEndSyncRequest event
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.OnEndSyncRequestEventArgs.#ctor(System.ServiceModel.Channels.Message)">
+            <summary>
+            Constructor of the event that is raised before processing a sync request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.OnEndSyncRequestEventArgs.Msg">
+            <summary>
+            Access message argument
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncService`1">
+            <summary>
+            SyncService implementation. This class handles the incoming requests for sync.
+            </summary>
+            <typeparam name="T">Entities class that is auto-generated by the SyncSvcUtil.exe tool.</typeparam>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.#cctor">
+            <summary>
+            Static constructor.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.OnBeginDiagnosticRequest">
+            <summary>
+            Method that can be overridden in a derived class to execute custom code before
+            performing diagnostic checks. If the method returns true, the diagnostics checks will be
+            done else a HTTP 404 response is sent back to the caller.
+            </summary>
+            <returns><see cref="T:System.Boolean" /> indicating whether diagnostics checks should be performed or not.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.ProcessRequestForMessage(System.IO.Stream)">
+            <summary>
+            Process an incoming request and return a WCF Message class instance.
+            </summary>
+            <param name="messageBody">Message body</param>
+            <returns>Instance of the WCF Message class</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.ProcessRequestToServiceRoot">
+            <summary>
+            This method is invoked when a GET request is made to the service root.
+            We will redirect this request to the /$syncscopes URL which will return a list of scopes.
+            Without this, the service returns a missing operation error.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.ProcessRequestForDiagnostics">
+            <summary>Processes the diagnostics page request.</summary>
+            <returns>The response <see cref="T:System.ServiceModel.Channels.Message"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.InitializeNewClient">
+            <summary>
+            Call the initialize client user code and create a new sync blob with the clientId.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.CreateConfiguration">
+            <summary>
+            This method tries to look up the service configuration from the MetadataCache.
+            For the first request, there will be no item in the cache and so, an object of type
+            SyncServiceConfiguration is created, initialized and added to the MetadataCache.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.CreateExceptionMessage(System.Net.HttpStatusCode,System.String)">
+            <summary>
+            Create a new instance of the WCF Message class that has the correct content type (xml/json) and has a serialized
+            instance of the SyncError class which is a representation of the error message.
+            </summary>
+            <param name="httpStatusCode">Status code to be used for the outgoing response.</param>
+            <param name="errorDescription">A description of the error.</param>
+            <returns>An instance of the WCF Message class that is sent as response.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncService`1.CreateMessageFromUnhandledException(System.Exception)">
+            <summary>Create a instance of <see cref="T:System.ServiceModel.Channels.Message" /> from an exception. This is sent as the response.</summary>
+            <param name="exception">Exception to process</param>
+            <returns>An instance of <see cref="T:System.ServiceModel.Channels.Message" /> class.</returns>
+        </member>
+        <member name="E:Microsoft.Synchronization.Services.SyncService`1.OnBeginSyncRequest">
+            <summary>
+            Event that is raised before processing a sync request.
+            </summary>
+        </member>
+        <member name="E:Microsoft.Synchronization.Services.SyncService`1.OnEndSyncRequest">
+            <summary>
+            Event that is raised before writing the response to the caller.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncServiceHost">
+            <summary>
+            WebServiceHost is a ServiceHost derived class that compliments the Windows Communication Foundation (WCF) Web programming model.
+            
+            If WebServiceHost finds no endpoints in the service description, it automatically creates a default endpoint 
+            at the service's base address for HTTP and HTTPS base addresses. 
+            It does not create an endpoint automatically if the user has configured an endpoint explicitly at the base address. 
+            WebServiceHost automatically configures the endpoint's binding to work with the associated 
+            Internet Information Services (IIS) security settings when used in a secure virtual directory. 
+            
+            When creating a default HTTP endpoint, the WebServiceHost also disables the HTTP Help page 
+            and the Web Services Description Language (WSDL) GET functionality so the metadata endpoint 
+            does not interfere with the default HTTP endpoint.
+            
+            In addition, the WebServiceHost class adds the WebHttpBehavior to all endpoints that do not already 
+            have the behavior and that have a WebMessageEncodingElement. 
+            If all the operations on the service have either empty HTTP request bodies or deal with the 
+            HTTP request body as a stream, then the WebServiceHost automatically 
+            configures the appropriate content type mapper for the binding.
+            
+            See http://msdn.microsoft.com/en-us/library/system.servicemodel.web.webservicehost.aspx for more information.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceHost.#ctor(System.Type,System.Uri[])">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="serviceType"></param>
+            <param name="baseAddresses"></param>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncServiceHostFactory">
+            <summary>
+            Factory that provides instances of ServiceHost in managed hosting environments 
+            where the host instance is created dynamically in response to incoming messages.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceHostFactory.CreateServiceHost(System.Type,System.Uri[])">
+            <summary>
+            Create a new service host.
+            </summary>
+            <param name="serviceType">Service Type</param>
+            <param name="baseAddresses">Base addresses</param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncServiceTracer">
+            <summary>
+            This class writes trace output for the sync service.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceTracer.TraceInfo(System.String,System.Object[])">
+            <summary>
+            Output info trace
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceTracer.TraceError(System.String,System.Object[])">
+            <summary>
+            Output error trace
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceTracer.TraceWarning(System.String,System.Object[])">
+            <summary>
+            Output warning trace
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncServiceTracer.TraceVerbose(System.String,System.Object[])">
+            <summary>
+            Output verbose trace
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncConflictContext">
+            <summary>
+            Represents a Client-Server conflict when processing client uploads.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncConflictContext.ClientChange">
+            <summary>
+            Gets the Entity version being uploaded by the client.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncConflictContext.ServerChange">
+            <summary>
+            Gets the Entity version available on the server.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncConflictContext.#ctor">
+            <summary>
+            Internal constructor to prevent public instantiation
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncUploadRequestOperationContext">
+            <summary>
+            Represents the Sync UploadChanges request operation and its associated metadata.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncUploadRequestOperationContext.IncomingChanges">
+            <summary>
+            Represents the entities being uploaded by the client. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncUploadRequestOperationContext.RejectChange(Microsoft.Synchronization.Services.IOfflineEntity,System.String)">
+            <summary>
+            Used when rejecting an item during upload request. Rejection may be due to validation errors or other 
+            business rules. The runtime will send an appropriate SyncError for this entity back to client.
+            </summary>
+            <param name="entity">The entity to reject</param>
+            <param name="rejectDescription">Reason for rejecting the change</param>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncUploadRequestOperationContext.RejectedEntries">
+            <summary>
+            Gets the rejected entities
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncUploadRequestOperationContext.#ctor">
+            <summary>
+            Internal constructor to prevent public instantiation
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncUploadResponseOperationContext">
+            <summary>
+            Represents the Sync UploadChanges response operation and its associated metadata.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncUploadResponseOperationContext.OutgoingChanges">
+            <summary>
+            Represents the entities being responsed by the server back to the client. The entities
+            in this collection represents the client insert's successful processed on the server. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.SyncUploadResponseOperationContext.Conflicts">
+            <summary>
+            Represents the collection of Conflicts being sent back to client. Contains both SyncConflict 
+            and SyncError elements.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.SyncUploadResponseOperationContext.#ctor">
+            <summary>
+            Internal constructor to prevent public instantiation
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.DiagHelper">
+            <summary>This class contains helper functions for service diagnostics.</summary>
+        </member>
+        <member name="F:Microsoft.Synchronization.Services.DiagHelper._compiledTransform">
+            <summary>Cached <see cref="T:System.Xml.Xsl.XslCompiledTransform" /> instance.</summary>
+        </member>
+        <member name="P:Microsoft.Synchronization.Services.DiagHelper.IsLocalRequest">
+            <summary>Gets a value indicating if the request originated from the local machine.</summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DiagHelper.CreateDiagResponseMessage(Microsoft.Synchronization.Services.SyncServiceConfiguration,Microsoft.Synchronization.Services.HttpContextServiceHost)">
+            <summary>
+            Perform diagnostic checks and return an instance of the <see cref="T:System.ServiceModel.Channels.Message" /> class.
+            </summary>
+            <param name="configuration">Service configuration</param>
+            <param name="serviceHost">HttpContext for the service</param>
+            <returns>Result of the diagnostic checks</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DiagHelper.CheckDbProvisioning(Microsoft.Synchronization.Services.SyncServiceConfiguration)">
+            <summary>Check if the database is provisioned and has a template/scope that the service is configured for.</summary>
+            <param name="configuration">Service configuration</param>
+            <returns>Result of the diagnostic check</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DiagHelper.CheckSqlConnection(Microsoft.Synchronization.Services.SyncServiceConfiguration)">
+            <summary>Check whether a connection can be opened successfully to the database.</summary>
+            <param name="configuration">Service configuration</param>
+            <returns>Result of the diagnostic check</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DiagHelper.CheckForSyncFxCore">
+            <summary>Check whether the SyncFx core assemblies are available.</summary>
+            <returns>Result of the diagnostic check</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DiagHelper.CheckForClientAccessPolicy(Microsoft.Synchronization.Services.HttpContextServiceHost)">
+            <summary>Check whether the website root has a ClientAccessPolicy.xml or CrossDomain.xml file.</summary>
+            <returns>Result of the diagnostic check</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DiagHelper.CheckWriteAccessToBatchingFolder(Microsoft.Synchronization.Services.SyncServiceConfiguration)">
+            <summary>Check whether the service has write permissions to the batch folder.</summary>
+            <param name="configuration">Service configuration.</param>
+            <returns>Result of the diagnostic check</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DiagHelper.CheckBatchingFolderExists(Microsoft.Synchronization.Services.SyncServiceConfiguration)">
+            <summary>Check whether the batch folder exists.</summary>
+            <param name="configuration">Service configuration.</param>
+            <returns>Result of the diagnostic check</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.DiagHelper.ConfigureXslCompiledTransform">
+            <summary>Create and cache the compiled transform if was not already created earlier.</summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.DiagHelper.DiagConstants">
+            <summary>Constants used in the diagnostic logic.</summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.DiagHelper.DiagTestResult">
+            <summary>Contains the result of a single diagnostic test and any exception details if errors occur.</summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.ODataIdParser">
+            <summary>
+            This code parses an OData KeyValue string and returns the primitive type.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Synchronization.Services.SyncServiceConstants">
+            <summary>
+             This class contains constants used by the service code.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.WebUtil.ChangeType(System.Object,System.Type)">
+            <summary>
+            Generic ChangeType method. Extends the Convert.ChangeType functionality to cover more cases.
+            </summary>
+            <param name="value">Value to change</param>
+            <param name="type">Type to convert to</param>
+            <returns>item of type passed passed as a parameter</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.WebUtil.IsFatalException(System.Exception)">
+            <summary>
+            Checks if an exception can be handled by the service.
+            </summary>
+            <param name="exception">Exception to check</param>
+            <returns>True - If exception cannot be handled (fatal), false - otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.WebUtil.IsFriendClass(System.Type)">
+            <summary>
+            Checks if a type belongs to a friend assembly.
+            </summary>
+            <param name="type">Type to check</param>
+            <returns>true if type belongs to a friend assembly, false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.WebUtil.CreateResponseMessage(System.Xml.Linq.XDocument)">
+            <summary>
+            Create a WCF message object that is sent as a response. Write the contents of the XDocument to the response.
+            </summary>
+            <param name="document"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.WebUtil.GenerateOfflineEntityId(Microsoft.Synchronization.Services.IOfflineEntity)">
+            <summary>
+            Generate the Id for an entity. The format currently is the OData Id.
+            i.e. http://baseUri/tableName(primarykeylist)
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Synchronization.Services.WebUtil.ParseIdStringAndPopulateKeyFields(Microsoft.Synchronization.Services.IOfflineEntity,System.Uri)">
+            <summary>
+            Parse the Id string and populate key fields of the object. This is called when the client sends tombstones
+            and the Key fields are not present in the input payload.
+            The approach used is to parse each key field individually and set it to a property with the same name.
+            For example: For http://host/service.svc/Tag(ID=1), we parse out ID=1 and then populate the ID property of the targetObject with the
+            value 1.
+            </summary>
+            <param name="entity">Entity for which we need to set the key fields.</param>
+            <param name="serviceBaseUri">
+            Base Uri of the service. The ServiceMetadata.Id property has the Uri which we want to strip off before attempting to 
+            parse the keys and values.
+            </param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.#ctor(Microsoft.Synchronization.SyncIdFormat,System.Collections.Generic.List{System.String})">
+            <summary>
+            Creates a Range set build and pre calculates the effective
+            tables ranges for use later when building a BatchRangeSet.
+            </summary>
+            <param name="idFormat"> 
+            The id format for the SyncIds
+            </param>
+            <param name="tableNames"> 
+            All the table names in that will be in the sum of the
+            batches. Order does not matter.
+            </param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.StartBuildingBatchRangeSet(Microsoft.Synchronization.Data.BatchRangeSet)">
+             <summary>
+             Start building state for a BatchRangeSet.
+             call sequence should be:
+                  StartBuildingBatchRangeSet( prevRs )
+                  AddSyncId(Sid)
+                  ...
+                  AddSyncId(Sid)
+                  StartNextTable( tname ) 
+                  AddSyncId(Sid)
+                  result = FinishBuildingBatchRangeSet()
+            
+             Note that this implicitly starts the range with the end of
+             prevRS+1
+             ***** We don't track the prevRS internally because we want to be able
+             ***** to rebuild a rangeset from scratch if we for
+             ***** instance change the batching limits
+             </summary>
+             <param name="prevRS"> 
+             The prev rangeset that was built.
+             </param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.StartBuildingFirstBatchRangeSet">
+            <summary>
+            Start building state for a BatchRangeSet.
+            call sequence should be:
+                 StartBuildingFirstBatchRangeSet( )
+                 AddSyncId(Sid)
+                 ...
+                 AddSyncId(Sid)
+                 StartNextTable( tname ) 
+                 AddSyncId(Sid)
+                 result = FinishBuildingBatchRangeSet()
+            Note that this implicetly starts the range with 
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.FinishBuildingBatchRangeSet">
+            <summary>
+            Returns the range set that we are using and resets the in
+            progress state.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.AbortRangeSet">
+            <summary>
+            Aborts the partially build range set if it exists.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.FinishLastBatchRangeSet">
+            <summary>
+            This ends the current table when there are no more tables
+            add to ranges and returns the range set. The last range
+            set can not be used to start building a new range set
+            </summary>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.StartNextTable(System.String)">
+            <summary>
+            End the range for the current table and starts the next table.
+            </summary>
+            <param name="tableName"> 
+            Name of the next table.
+            </param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.AddSyncId(System.String,Microsoft.Synchronization.SyncId)">
+            <summary>
+            This adds a SyncId as the maximum SyncId for the current table.
+            </summary>
+            <param name="tableName"> The name of the table which holds
+            the SyncId</param>
+            <param name="maxSyncIdInCurrentTable"> The new end SyncId</param>
+        </member>
+        <member name="M:Microsoft.Synchronization.Data.BatchRangeSetBuilder.IdPlusOne(Microsoft.Synchronization.SyncIdFormat,Microsoft.Synchronization.SyncId)">
+            <summary>
+            Creates syncid plus one. This method matches the method in
+            ./sync/src/xproc/knowledge/SyncId.cpp -> SyncId::InitializeByIncrement()
+            </summary>
+            <param name="idFormat"> 
+            The item id format information.
+            </param>
+            <param name="origId"> 
+            The SyncId that we want the "plus one" for.
+            </param>
+        </member>
+    </members>
+</doc>
