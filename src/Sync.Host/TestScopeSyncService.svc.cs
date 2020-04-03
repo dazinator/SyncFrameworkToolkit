@@ -16,13 +16,13 @@ namespace SyncTest {
         
         public static void InitializeService(Microsoft.Synchronization.Services.ISyncServiceConfiguration config) {
             // TODO: MUST set these values
-            // config.ServerConnectionString = "connection string here";
-            // config.SetEnableScope("scope name goes here");
+             config.ServerConnectionString = "Data Source=(localdb)\\ProjectsV13;Initial Catalog=SyncTest;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+             config.SetEnableScope("TestScope");
             // 
             // 
             // TODO: Optional.
-            // config.SetDefaultSyncSerializationFormat(Microsoft.Synchronization.Services.SyncSerializationFormat.ODataJson);
-            // config.SetConflictResolutionPolicy(Microsoft.Synchronization.Services.ConflictResolutionPolicy.ServerWins);
+             config.SetDefaultSyncSerializationFormat(Microsoft.Synchronization.Services.SyncSerializationFormat.ODataJson);
+             config.SetConflictResolutionPolicy(Microsoft.Synchronization.Services.ConflictResolutionPolicy.ServerWins);
         }
     }
     #endregion
